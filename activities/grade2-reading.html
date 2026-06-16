@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الصف الثاني - القراءة</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#6C63FF;--accent:#00C9A7;--wrong:#FF6584;--bg:#F0F2FF;--card:#FFF;--text:#2D3436;--light:#636E72;--radius:20px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.header{background:linear-gradient(135deg,var(--primary),#5A52D5);color:#fff;text-align:center;padding:25px 20px;}
+.back{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;background:rgba(255,255,255,.2);padding:8px 16px;border-radius:12px;margin-bottom:10px;font-weight:600;font-size:.95em;}
+.container{max-width:700px;margin:0 auto;padding:25px 20px;}
+.passage{background:var(--card);border-radius:var(--radius);padding:25px;margin-bottom:24px;box-shadow:0 8px 30px rgba(108,99,255,.12);line-height:2;font-size:1.15em;}
+.passage h3{color:var(--primary);margin-bottom:12px;font-size:1.2em;}
+.passage .en-text{direction:ltr;text-align:left;font-size:1.05em;color:var(--text);font-weight:500;}
+.question-block{background:var(--card);border-radius:var(--radius);padding:22px;margin-bottom:18px;box-shadow:0 4px 20px rgba(108,99,255,.08);}
+.question-block h4{margin-bottom:14px;font-size:1.05em;color:var(--text);}
+.options{display:flex;flex-direction:column;gap:10px;}
+.option{padding:14px 18px;border:2px solid #E8E8FF;border-radius:14px;cursor:pointer;transition:all .2s;font-size:1.05em;display:flex;align-items:center;gap:10px;}
+.option:hover{border-color:var(--primary);background:#F8F7FF;}
+.option.selected{border-color:var(--primary);background:#EDE9FF;}
+.option.correct{border-color:var(--accent)!important;background:#E0FFF8!important;color:#00875A;}
+.option.wrong{border-color:var(--wrong)!important;background:#FFF0F3!important;color:#C0392B;}
+.option .letter{background:#EDE9FF;color:var(--primary);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;}
+.controls{display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap;}
+.btn{padding:14px 36px;border:none;border-radius:14px;font-family:'Tajawal',sans-serif;font-size:1.1em;font-weight:700;cursor:pointer;transition:all .3s;}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#5A52D5);color:#fff;box-shadow:0 4px 15px rgba(108,99,255,.4);}
+.btn-primary:hover{transform:translateY(-2px);}
+.btn-secondary{background:#EDE9FF;color:var(--primary);}
+.result-box{background:var(--card);border-radius:var(--radius);padding:30px;text-align:center;box-shadow:0 8px 30px rgba(108,99,255,.15);display:none;margin-top:20px;}
+.result-box .score{font-size:3em;font-weight:900;color:var(--primary);margin:15px 0;}
+.result-box .details{color:var(--light);font-size:1.05em;margin-bottom:20px;}
+.timer{background:rgba(255,255,255,.15);padding:8px 16px;border-radius:10px;display:inline-block;font-weight:700;margin-bottom:15px;}
+@media(max-width:600px){.passage{padding:18px;}.option{padding:12px 14px;}}
+</style>
+</head>
+<body>
+<div class="header">
+<a href="../grade2.html" class="back">→ رجوع</a>
+<h1>📖 القراءة - الصف الثاني</h1>
+<div class="timer" id="timer">⏱ 00:00</div>
+</div>
+<div class="container">
+<div class="passage">
+<h3>📕 اقرأ القطعة التالية:</h3>
+<div class="en-text">
+My name is Ahmed. I am seven years old. I like to play football with my friends. My favorite color is blue. I have a small dog. His name is Max. Max likes to eat and sleep. I love my dog very much.
+</div>
+</div>
+<div id="quiz"></div>
+<div class="controls" id="controls">
+<button class="btn btn-primary" onclick="submitAnswers()">تسليم ✓</button>
+</div>
+<div class="result-box" id="result">
+<h2 id="resultTitle"></h2>
+<div class="score" id="scoreDisplay"></div>
+<div class="details" id="resultDetails"></div>
+<div class="controls">
+<button class="btn btn-secondary" onclick="restartActivity()">إعادة المحاولة ↻</button>
+<a href="../grade2.html" class="btn btn-primary">العودة للألعاب</a>
+</div>
+</div>
+</div>
+<script>
+const quizData={
+grade:2,
+gradeName:'الصف الثاني',
+activity:'reading',
+activityName:'القراءة',
+questions:[
+{text:'What is the boy\'s name?',options:['Ahmed','Mohamed','Ali','Omar'],correct:0},
+{text:'How old is he?',options:['Five','Six','Seven','Eight'],correct:2},
+{text:'What does he like to play?',options:['Basketball','Football','Tennis','Swimming'],correct:1},
+{text:'What is his favorite color?',options:['Red','Green','Yellow','Blue'],correct:3},
+{text:'What is the dog\'s name?',options:['Buddy','Max','Rex','Charlie'],correct:1}
+],
+};
+let answers={};let startTime=Date.now();let timerInterval;
+// Timer
+timerInterval=setInterval(()=>{const s=Math.floor((Date.now()-startTime)/1000);const m=String(Math.floor(s/60)).padStart(2,'0');const sec=String(s%60).padStart(2,'0');document.getElementById('timer').textContent=`⏱ ${m}:${sec}`;},1000);
+// Render
+const quiz=document.getElementById('quiz');
+const letters=['أ','ب','ج','د'];
+quizData.questions.forEach((q,i)=>{
+const div=document.createElement('div');div.className='question-block';
+div.innerHTML=`<h4>${i+1}. ${q.text}</h4><div class="options">${q.options.map((o,j)=>`<div class="option" data-q="${i}" data-a="${j}" onclick="selectOption(this,${i},${j})"><span class="letter">${letters[j]}</span><span>${o}</span></div>`).join('')}</div>`;
+quiz.appendChild(div);
+});
+function selectOption(el,qIdx,aIdx){
+document.querySelectorAll(`.option[data-q="${qIdx}"]`).forEach(o=>o.classList.remove('selected'));
+el.classList.add('selected');answers[qIdx]=aIdx;
+}
+function submitAnswers(){
+const unanswered=quizData.questions.length-Object.keys(answers).length;
+if(unanswered>0){if(!confirm(`متبقي ${unanswered} سؤال بدون إجابة. هل تريد التسليم؟`))return;}
+clearInterval(timerInterval);
+let correct=0;
+quizData.questions.forEach((q,i)=>{
+const isCorrect=answers[i]===q.correct;
+if(isCorrect)correct++;
+document.querySelectorAll(`.option[data-q="${i}"]`).forEach(o=>{
+const a=parseInt(o.dataset.a);
+if(a===q.correct)o.classList.add('correct');
+if(answers[i]===a&&!isCorrect)o.classList.add('wrong');
+o.style.pointerEvents='none';
+});
+});
+const timeSec=Math.floor((Date.now()-startTime)/1000);
+const total=quizData.questions.length;
+const pct=Math.round((correct/total)*100);
+const resultBox=document.getElementById('result');
+document.getElementById('controls').style.display='none';
+document.getElementById('resultTitle').textContent=correct===total?'🎉 ممتاز!':'👍 أحسنت!';
+document.getElementById('scoreDisplay').textContent=`${correct} / ${total}`;
+document.getElementById('resultDetails').innerHTML=`النتيجة: ${pct}% | الوقت: ${Math.floor(timeSec/60)} دقيقة و ${timeSec%60} ثانية`;
+resultBox.style.display='block';
+saveResult(correct,total,pct,timeSec);
+}
+function saveResult(score,total,pct,time){
+const result={
+studentName:localStorage.getItem('studentName')||'طالب',
+grade:2,gradeName:'الصف الثاني',
+activityName:'القراءة',
+score,total,percentage:pct,
+time_taken_seconds:time,
+date:new Date().toISOString().split('T')[0],
+answers:answers,
+submittedAt:new Date().toISOString()
+};
+// Try to save to serverless API, or localStorage fallback
+fetch('/api/save-result', {
+method: 'POST',
+headers: {'Content-Type':'application/json'},
+body: JSON.stringify(result)
+}).catch(()=>{
+// Fallback to localStorage
+let all=JSON.parse(localStorage.getItem('studentResults')||'[]');
+all.push(result);localStorage.setItem('studentResults',JSON.stringify(all));
+});
+}
+function restartActivity(){answers={};document.getElementById('result').style.display='none';document.getElementById('controls').style.display='flex';location.reload();}
+</script>
+</body>
+</html>

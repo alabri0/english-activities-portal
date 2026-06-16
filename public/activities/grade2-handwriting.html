@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الصف الثاني - الكتابة</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#6C63FF;--accent:#00C9A7;--bg:#F0F2FF;--card:#FFF;--text:#2D3436;--light:#636E72;--radius:20px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.header{background:linear-gradient(135deg,var(--primary),#5A52D5);color:#fff;text-align:center;padding:25px 20px;}
+.back{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;background:rgba(255,255,255,.2);padding:8px 16px;border-radius:12px;margin-bottom:10px;font-weight:600;}
+.container{max-width:700px;margin:0 auto;padding:25px 20px;}
+.canvas-area{background:var(--card);border-radius:var(--radius);padding:25px;box-shadow:0 8px 30px rgba(108,99,255,.12);margin-bottom:20px;}
+.canvas-area h3{margin-bottom:12px;color:var(--primary);}
+.target-word{direction:ltr;text-align:center;font-size:3em;font-weight:800;color:#D0D0E0;font-family:'Patrick Hand',cursive;margin:20px 0;user-select:none;}
+.canvas-wrapper{position:relative;border:3px dashed #D0D0E0;border-radius:14px;overflow:hidden;background:#FAFAFF;}
+canvas{display:block;cursor:crosshair;touch-action:none;}
+.toolbar{display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;justify-content:center;}
+.tool-btn{padding:10px 20px;border:2px solid #E8E8FF;border-radius:12px;background:var(--card);cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:600;font-size:.95em;transition:all .2s;}
+.tool-btn:hover{border-color:var(--primary);background:#F8F7FF;}
+.tool-btn.primary{background:var(--primary);color:#fff;border-color:var(--primary);}
+.word-selector{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
+.word-btn{padding:8px 16px;border:2px solid #E8E8FF;border-radius:10px;background:var(--card);cursor:pointer;font-family:'Patrick Hand',cursive;font-size:1.1em;direction:ltr;transition:all .2s;}
+.word-btn:hover,.word-btn.active{border-color:var(--primary);background:#EDE9FF;color:var(--primary);}
+.timer{background:rgba(255,255,255,.15);padding:8px 16px;border-radius:10px;display:inline-block;font-weight:700;margin-bottom:15px;}
+.complete-msg{text-align:center;padding:40px;color:var(--accent);font-size:1.3em;font-weight:700;}
+</style>
+</head>
+<body>
+<div class="header">
+<a href="../grade2.html" class="back">→ رجوع</a>
+<h1>✍️ الكتابة - الصف الثاني</h1>
+<div class="timer" id="timer">⏱ 00:00</div>
+</div>
+<div class="container">
+<div class="canvas-area">
+<h3>🖊️ اكتب الكلمة باللغة الإنجليزية:</h3>
+<div class="word-selector" id="wordSelector"></div>
+<div class="target-word" id="targetWord">Cat</div>
+<div class="canvas-wrapper">
+<canvas id="drawCanvas" width="600" height="250"></canvas>
+</div>
+<div class="toolbar">
+<button class="tool-btn" onclick="undo()">↩ تراجع</button>
+<button class="tool-btn primary" onclick="clearCanvas()">🗑️ مسح</button>
+<button class="tool-btn primary" onclick="nextWord()">التالي ←</button>
+<button class="tool-btn primary" onclick="finishActivity()">✅ إنهاء</button>
+</div>
+</div>
+<div class="complete-msg" id="completeMsg" style="display:none;">
+🎉 أحسنت! لقد أنهيت جميع الكلمات!
+<div style="margin-top:15px;">
+<button class="tool-btn primary" onclick="location.reload()">إعادة ↻</button>
+</div>
+</div>
+</div>
+<script>
+const words=['Cat','Dog','Sun','Book','Red','Fun','Run','Big'];
+let currentWord=0;let strokes=[];let currentStroke=[];let drawing=false;
+const canvas=document.getElementById('drawCanvas');const ctx=canvas.getContext('2d');
+function resizeCanvas(){const w=canvas.parentElement.clientWidth;canvas.width=w;canvas.height=250;}
+resizeCanvas();window.addEventListener('resize',resizeCanvas);
+function getPos(e){const r=canvas.getBoundingClientRect();const t=e.touches?e.touches[0]:e;return{x:t.clientX-r.left,y:t.clientY-r.top};}
+canvas.addEventListener('mousedown',e=>{drawing=true;const p=getPos(e);currentStroke=[p];strokes.push(currentStroke);ctx.beginPath();ctx.moveTo(p.x,p.y);});
+canvas.addEventListener('mousemove',e=>{if(!drawing)return;const p=getPos(e);currentStroke.push(p);ctx.lineTo(p.x,p.y);ctx.strokeStyle='#6C63FF';ctx.lineWidth=3;ctx.lineCap='round';ctx.stroke();});
+canvas.addEventListener('mouseup',()=>{drawing=false;});
+canvas.addEventListener('touchstart',e=>{e.preventDefault();drawing=true;const p=getPos(e);currentStroke=[p];strokes.push(currentStroke);ctx.beginPath();ctx.moveTo(p.x,p.y);},{passive:false});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();if(!drawing)return;const p=getPos(e);currentStroke.push(p);ctx.lineTo(p.x,p.y);ctx.strokeStyle='#6C63FF';ctx.lineWidth=3;ctx.lineCap='round';ctx.stroke();},{passive:false});
+canvas.addEventListener('touchend',()=>{drawing=false;});
+function clearCanvas(){ctx.clearRect(0,0,canvas.width,canvas.height);strokes=[];currentStroke=[];}
+function undo(){if(strokes.length>0){strokes.pop();redraw();}}
+function redraw(){ctx.clearRect(0,0,canvas.width,canvas.height);strokes.forEach(s=>{if(s.length<2)return;ctx.beginPath();ctx.moveTo(s[0].x,s[0].y);for(let i=1;i<s.length;i++){ctx.lineTo(s[i].x,s[i].y);}ctx.strokeStyle='#6C63FF';ctx.lineWidth=3;ctx.lineCap='round';ctx.stroke();});}
+const sel=document.getElementById('wordSelector');
+words.forEach((w,i)=>{const b=document.createElement('button');b.className='word-btn'+(i===0?' active':'');b.textContent=w;b.onclick=()=>{document.querySelectorAll('.word-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('targetWord').textContent=w;clearCanvas();currentWord=i;};sel.appendChild(b);});
+setInterval(()=>{const s=Math.floor((Date.now()-startTime)/1000);document.getElementById('timer').textContent=`⏱ ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;},1000);
+let startTime=Date.now();
+function nextWord(){if(currentWord<words.length-1){currentWord++;document.getElementById('targetWord').textContent=words[currentWord];document.querySelectorAll('.word-btn').forEach((b,i)=>b.classList.toggle('active',i===currentWord));clearCanvas();}}
+function finishActivity(){const time=Math.floor((Date.now()-startTime)/1000);document.getElementById('completeMsg').style.display='block';const canvas=document.getElementById('drawCanvas');const dataUrl=canvas.toDataURL();const r={studentName:localStorage.getItem('studentName')||'طالب',grade:2,gradeName:'الصف الثاني',activityName:'الكتابة اليدوية',score:strokes.length,total_questions:1,percentage:100,time_taken_seconds:time,date:new Date().toISOString().split('T')[0],drawingData:dataUrl,submittedAt:new Date().toISOString()};fetch('/api/save-result',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(r)}).catch(()=>{let a=JSON.parse(localStorage.getItem('studentResults')||'[]');a.push(r);localStorage.setItem('studentResults',JSON.stringify(a));});}
+</script>
+</body>
+</html>

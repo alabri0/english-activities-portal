@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الصف السادس - بوابة الأنشطة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary:#FF6584; --primary-dark:#E5577A; --secondary:#6C63FF; --accent:#00C9A7; --bg:#FFF5F7; --card:#FFF; --text:#2D3436; --light:#636E72; --shadow:0 10px 40px rgba(255,101,132,.15); --radius:20px; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Tajawal',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+        .header { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; text-align:center; padding:30px 20px; }
+        .header h1 { font-size:1.8em; font-weight:800; }
+        .back-btn { display:inline-flex; align-items:center; gap:6px; color:#fff; text-decoration:none; background:rgba(255,255,255,.2); padding:8px 18px; border-radius:12px; margin-bottom:12px; font-weight:600; }
+        .container { max-width:800px; margin:0 auto; padding:30px 20px; }
+        .student-info { background:var(--card); border-radius:var(--radius); padding:16px 24px; margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; box-shadow:var(--shadow); }
+        .student-info span { font-weight:700; }
+        .activities-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; }
+        .activity-card { background:var(--card); border-radius:var(--radius); padding:30px 20px; text-align:center; cursor:pointer; transition:all .3s; box-shadow:var(--shadow); }
+        .activity-card:hover { transform:translateY(-6px); box-shadow:0 15px 40px rgba(255,101,132,.2); }
+        .activity-card .icon { font-size:3em; display:block; margin-bottom:12px; }
+        .activity-card h3 { font-size:1.2em; font-weight:700; margin-bottom:6px; color:var(--primary); }
+        .activity-card p { color:var(--light); font-size:.95em; }
+        @media(max-width:600px) { .header h1 { font-size:1.4em; } .activities-grid { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="student-dashboard.html" class="back-btn" style="margin-right:10px;background:rgba(0,201,167,.3);padding:8px 14px;">📊 نتائجي</a> <a href="index.html" class="back-btn">→ العودة للرئيسية</a>
+        <h1>🚀 أنشطة الصف السادس</h1>
+        <p>اختر نشاطاً للبدء</p>
+    </div>
+    <div class="container">
+        <div class="student-info">
+            <span>👤 <span id="sname"></span></span>
+            <span style="color:var(--light);">📅 <span id="sdate"></span></span>
+        </div>
+        <div class="activities-grid">
+            <div class="activity-card" onclick="goActivity('reading')">
+                <span class="icon">📖</span>
+                <h3>القراءة</h3>
+                <p>اقرأ القطعة وأجب</p>
+            </div>
+            <div class="activity-card" onclick="goActivity('comprehension')">
+                <span class="icon">🧠</span>
+                <h3>الفهم والاستيعاب</h3>
+                <p>أسئلة الفهم</p>
+            </div>
+            <div class="activity-card" onclick="goActivity('grammar')">
+                <span class="icon">✏️</span>
+                <h3>القواعد</h3>
+                <p>اختر الإجابة الصحيحة</p>
+            </div>
+            <div class="activity-card" onclick="goActivity('vocabulary')">
+                <span class="icon">📝</span>
+                <h3>المفردات</h3>
+                <p>اختبار الكلمات</p>
+            </div>
+            <div class="activity-card" onclick="goActivity('handwriting')">
+                <span class="icon">✍️</span>
+                <h3>الكتابة اليدوية</h3>
+                <p>تتبع الأحرف والكلمات</p>
+            </div>            <div class="activity-card" onclick="goActivity('word-scramble')">
+                <span class="icon">🔀</span>
+                <h3>ترتيب الحروف</h3>
+                <p>رتّب الحروف المبعثرة</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        const token = localStorage.getItem('studentToken');
+        const grade = localStorage.getItem('studentGrade');
+        if (!token || parseInt(grade) !== 6) { window.location.href = 'student-portal.html'; }
+        document.getElementById('sdate').textContent = new Date().toLocaleDateString('ar-EG');
+        function goActivity(act) {
+            window.location.href = `activities/grade6-${act}.html`;
+        }
+    </script>
+</body>
+</html>

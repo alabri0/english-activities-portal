@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة الطلاب | تسجيل الدخول</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6C63FF; --primary-dark: #5A52D5;
+            --secondary: #FF6584; --accent: #00C9A7;
+            --bg: #F0F2FF; --card: #FFF; --text: #2D3436; --light: #636E72;
+            --shadow: 0 10px 40px rgba(108,99,255,.15); --radius: 20px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Tajawal',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+        .bg-decoration { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:hidden; }
+        .bg-circle { position:absolute; border-radius:50%; opacity:.08; animation:float 20s ease-in-out infinite; }
+        .bg-circle:nth-child(1) { width:400px; height:400px; background:var(--primary); top:-100px; right:-100px; animation-delay:0s; }
+        .bg-circle:nth-child(2) { width:300px; height:300px; background:var(--secondary); bottom:-80px; left:-80px; animation-delay:-7s; }
+        .bg-circle:nth-child(3) { width:200px; height:200px; background:var(--accent); top:50%; left:50%; animation-delay:-14s; }
+        @keyframes float { 0%,100%{transform:translate(0,0) scale(1);} 33%{transform:translate(30px,-30px) scale(1.05);} 66%{transform:translate(-20px,20px) scale(.95);} }
+        .header { position:relative; z-index:10; text-align:center; padding:60px 20px 30px; }
+        .header h1 { font-size:2.2em; font-weight:900; background:linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .header p { color:var(--light); font-size:1.1em; margin-top:8px; }
+        .container { position:relative; z-index:10; max-width:500px; margin:0 auto; padding:0 20px 60px; }
+        .login-card { background:var(--card); border-radius:var(--radius); padding:40px 35px; box-shadow:var(--shadow); }
+        .login-card h2 { text-align:center; color:var(--primary); margin-bottom:8px; font-size:1.4em; }
+        .login-card .subtitle { text-align:center; color:var(--light); margin-bottom:30px; font-size:.95em; }
+        .form-group { margin-bottom:20px; }
+        .form-group label { display:block; font-weight:700; margin-bottom:8px; color:var(--text); }
+        .form-group input, .form-group select { width:100%; padding:14px 18px; border:2px solid #E8E8FF; border-radius:14px; font-family:'Tajawal',sans-serif; font-size:1.05em; outline:none; transition:border-color .3s; }
+        .form-group input:focus, .form-group select:focus { border-color:var(--primary); }
+        .form-group input.error { border-color:var(--secondary); }
+        .btn { width:100%; padding:16px; border:none; border-radius:14px; font-family:'Tajawal',sans-serif; font-size:1.15em; font-weight:700; cursor:pointer; transition:all .3s; }
+        .btn-primary { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; box-shadow:0 4px 15px rgba(108,99,255,.4); }
+        .btn-primary:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(108,99,255,.5); }
+        .btn-primary:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+        .error-msg { color:var(--secondary); font-size:.9em; margin-top:6px; display:none; }
+        .back-link { text-align:center; margin-top:24px; }
+        .back-link a { color:var(--light); text-decoration:none; font-weight:600; }
+        .back-link a:hover { color:var(--primary); }
+        .welcome { display:none; text-align:center; padding:30px; }
+        .welcome .icon { font-size:4em; margin-bottom:15px; }
+        .welcome h2 { color:var(--primary); margin-bottom:10px; }
+        .welcome p { color:var(--light); margin-bottom:25px; }
+        .welcome .btn { max-width:300px; margin:8px auto; display:block; }
+        @media(max-width:600px) { .login-card { padding:30px 20px; } .header h1 { font-size:1.6em; } }
+    </style>
+</head>
+<body>
+    <div class="bg-decoration">
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+    </div>
+
+    <div class="header">
+        <h1>📚 بوابة الطلاب</h1>
+        <p>سجّل دخولك للوصول لأنشطتك</p>
+    </div>
+
+    <div class="container">
+        <!-- Login Form -->
+        <div class="login-card" id="loginCard">
+            <h2>🔑 تسجيل الدخول</h2>
+            <p class="subtitle">أدخل كود الصف وكلمة المرور</p>
+            <div class="form-group">
+                <label>الصف</label>
+                <select id="loginGrade">
+                    <option value="">اختر صفك</option>
+                    <option value="1">الصف الأول</option>
+                    <option value="2">الصف الثاني</option>
+                    <option value="3">الصف الثالث</option>
+                    <option value="4">الصف الرابع</option>
+                    <option value="5">الصف الخامس</option>
+                    <option value="6">الصف السادس</option>
+                    <option value="7">الصف السابع</option>
+                    <option value="8">الصف الثامن</option>
+                    <option value="9">الصف التاسع</option>
+                    <option value="10">الصف العاشر</option>
+                    <option value="11">الصف الحادي عشر</option>
+                    <option value="12">الصف الثاني عشر</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>كلمة المرور</label>
+                <input type="password" id="loginPassword" placeholder="أدخل كلمة المرور">
+                <div class="error-msg" id="loginError">كلمة المرور غير صحيحة</div>
+            </div>
+            <button class="btn btn-primary" id="loginBtn" onclick="studentLogin()">دخول ←</button>
+        </div>
+
+        <!-- Welcome (shown after login) -->
+        <div class="login-card welcome" id="welcomeCard">
+            <div class="icon">👋</div>
+            <h2 id="welcomeName"></h2>
+            <p>مرحباً بك في بوابة الأنشطة الإنجليزية! اختر نشاطاً للبدء:</p>
+            <button class="btn btn-primary" onclick="goToActivities()">📖 الأنشطة</button>
+            <button class="btn btn-primary" style="background:linear-gradient(135deg,#00C9A7,#00896A); margin-top:8px;" onclick="goToDashboard()">📊 نتائجي</button>
+            <div style="margin-top:15px; padding-top:15px; border-top:1px solid #eee;">
+                <a href="admin.html" style="display:inline-flex; align-items:center; gap:6px; color:#636E72; text-decoration:none; font-size:.95em; font-weight:600; margin:0 8px;">
+                    🔧 لوحة المشرف
+                </a>
+                <a href="index.html" style="display:inline-flex; align-items:center; gap:6px; color:#636E72; text-decoration:none; font-size:.95em; font-weight:600; margin:0 8px;">
+                    🏠 الرئيسية
+                </a>
+            </div>
+            <div class="back-link" style="margin-top:20px;">
+                <a href="#" onclick="logout()">تسجيل خروج</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        async function studentLogin() {
+            const grade = document.getElementById('loginGrade').value;
+            const password = document.getElementById('loginPassword').value.trim();
+            const errorEl = document.getElementById('loginError');
+            const btn = document.getElementById('loginBtn');
+
+            errorEl.style.display = 'none';
+            document.getElementById('loginPassword').classList.remove('error');
+
+            if (!grade) {
+                errorEl.textContent = 'الرجاء اختيار الصف';
+                errorEl.style.display = 'block';
+                return;
+            }
+            if (!password) {
+                errorEl.textContent = 'الرجاء إدخال كلمة المرور';
+                errorEl.style.display = 'block';
+                document.getElementById('loginPassword').classList.add('error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'جاري التحقق...';
+
+            try {
+                const res = await fetch(`${API_BASE}/api/students/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ grade: parseInt(grade), password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    localStorage.setItem('studentToken', data.student.token);
+                    localStorage.setItem('studentId', data.student.id);
+                    localStorage.setItem('studentGrade', data.student.grade);
+                    // We don't have first_name from login API, use grade-based default
+                    const gradeNames = {
+                        1:'الصف الأول', 2:'الصف الثاني', 3:'الصف الثالث', 4:'الصف الرابع',
+                        5:'الصف الخامس', 6:'الصف السادس', 7:'الصف السابع', 8:'الصف الثامن',
+                        9:'الصف التاسع', 10:'الصف العاشر', 11:'الصف الحادي عشر', 12:'الصف الثاني عشر'
+                    };
+                    document.getElementById('welcomeName').textContent = `أهلاً بك! ${gradeNames[data.student.grade] || 'صف ' + data.student.grade}`;
+                    document.getElementById('loginCard').style.display = 'none';
+                    document.getElementById('welcomeCard').style.display = 'block';
+                } else {
+                    errorEl.textContent = data.error || 'كلمة المرور غير صحيحة';
+                    errorEl.style.display = 'block';
+                    document.getElementById('loginPassword').classList.add('error');
+                }
+            } catch (e) {
+                errorEl.textContent = 'خطأ في الاتصال بالسيرفر';
+                errorEl.style.display = 'block';
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'دخول ←';
+        }
+
+        function goToActivities() {
+            window.location.href = `grade${localStorage.getItem('studentGrade')}.html`;
+        }
+
+        function goToDashboard() {
+            window.location.href = `student-dashboard.html`;
+        }
+
+        function logout() {
+            localStorage.removeItem('studentToken');
+            localStorage.removeItem('studentId');
+            localStorage.removeItem('studentGrade');
+            document.getElementById('welcomeCard').style.display = 'none';
+            document.getElementById('loginCard').style.display = 'block';
+            document.getElementById('loginPassword').value = '';
+        }
+
+        // Auto-login if token exists
+        (function() {
+            const token = localStorage.getItem('studentToken');
+            const grade = localStorage.getItem('studentGrade');
+            if (token && grade) {
+                // Verify token is still valid
+                fetch(`${API_BASE}/api/activities/stats/summary`, {
+                    headers: { 'Cookie': 'token=' + token }
+                }).then(r => {
+                    if (r.ok) {
+                        document.getElementById('loginCard').style.display = 'none';
+                        document.getElementById('welcomeCard').style.display = 'block';
+                        const gradeNames = {
+                            1:'الصف الأول', 2:'الصف الثاني', 3:'الصف الثالث', 4:'الصف الرابع',
+                            5:'الصف الخامس', 6:'الصف السادس', 7:'الصف السابع', 8:'الصف الثامن',
+                            9:'الصف التاسع', 10:'الصف العاشر', 11:'الصف الحادي عشر', 12:'الصف الثاني عشر'
+                        };
+                        document.getElementById('welcomeName').textContent = `أهلاً بك! ${gradeNames[grade] || 'صف ' + grade}`;
+                    } else {
+                        logout();
+                    }
+                }).catch(() => logout());
+            }
+        })();
+
+        // Enter key support
+        document.getElementById('loginPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') studentLogin();
+        });
+    </script>
+</body>
+</html>

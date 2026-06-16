@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المشرف</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background: #e9e9e9; border: none; border-radius: 5px; cursor: pointer; }
+        .tab.active { background: #007bff; color: white; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .btn { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background: #0056b3; }
+        .btn-danger { background: #dc3545; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; text-align: right; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .stat-card { background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center; }
+        #loginPage { text-align: center; max-width: 400px; margin: 100px auto; padding: 40px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        #loginPage h1 { margin-bottom: 30px; }
+        #loginPage input { margin-bottom: 15px; }
+        #loginPage button { width: 100%; }
+        #errorMsg { color: red; margin-top: 10px; display: none; }
+        #addMessage { margin-top: 15px; padding: 10px; border-radius: 4px; display: none; }
+        #mainDashboard { display: none; }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage">
+        <h1>🔧 تسجيل دخول المشرف</h1>
+        <div class="form-group">
+            <label>اسم المستخدم:</label>
+            <input type="text" id="loginUsername">
+        </div>
+        <div class="form-group">
+            <label>كلمة المرور:</label>
+            <input type="password" id="loginPassword">
+        </div>
+        <button class="btn" onclick="doLogin()">تسجيل الدخول</button>
+        <div id="errorMsg">اسم المستخدم أو كلمة المرور غير صحيحة</div>
+    </div>
+
+    <!-- Main Dashboard (hidden until login) -->
+    <div id="mainDashboard">
+        <div class="container">
+            <h1>🔧 لوحة تحكم المشرف</h1>
+            <button class="btn btn-danger" onclick="doLogout()">تسجيل خروج</button>
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('results')">📊 النتائج</button>
+                <button class="tab" onclick="showTab('students')">👥 إدارة الطلاب</button>
+                <button class="tab" onclick="showTab('add')">➕ إضافة طالب</button>
+            </div>
+            
+            <div id="results" class="section active">
+                <h2>📊 نتائج الطلاب</h2>
+                <div class="stats" id="stats"></div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>الطالب</th>
+                            <th>الصف</th>
+                            <th>النشاط</th>
+                            <th>النتيجة</th>
+                            <th>النسبة</th>
+                            <th>التاريخ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTable">
+                        <tr><td colspan="7" style="text-align: center;">جاري التحميل...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="students" class="section">
+                <h2>👥 إدارة الطلاب</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>الاسم</th>
+                            <th>الصف</th>
+                            <th>اسم المستخدم</th>
+                            <th>تاريخ الإضافة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTable">
+                        <tr><td colspan="6" style="text-align: center;">جاري التحميل...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="add" class="section">
+                <h2>➕ إضافة طالب جديد</h2>
+                <div class="form-group">
+                    <label>الاسم الأول:</label>
+                    <input type="text" id="firstName">
+                </div>
+                <div class="form-group">
+                    <label>الاسم الأخير:</label>
+                    <input type="text" id="lastName">
+                </div>
+                <div class="form-group">
+                    <label>الصف:</label>
+                    <select id="grade">
+                        <option value="1">الصف الأول</option>
+                        <option value="2">الصف الثاني</option>
+                        <option value="3">الصف الثالث</option>
+                        <option value="4">الصف الرابع</option>
+                        <option value="5">الصف الخامس</option>
+                        <option value="6">الصف السادس</option>
+                        <option value="7">الصف السابع</option>
+                        <option value="8">الصف الثامن</option>
+                        <option value="9">الصف التاسع</option>
+                        <option value="10">الصف العاشر</option>
+                        <option value="11">الصف الحادي عشر</option>
+                        <option value="12">الصف الثاني عشر</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>اسم المستخدم:</label>
+                    <input type="text" id="regUsername">
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور:</label>
+                    <input type="password" id="regPassword">
+                </div>
+                <button class="btn" onclick="addStudent()">إضافة الطالب</button>
+                <div id="addMessage" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let allResults = [];
+        let allStudents = [];
+        let authToken = '';
+        
+        // Login function
+        async function doLogin() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const response = await fetch('/api/teacher/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                if (data.success && data.token) {
+                    authToken = data.token;
+                    document.getElementById('loginPage').style.display = 'none';
+                    document.getElementById('mainDashboard').style.display = 'block';
+                    loadResults();
+                    loadStudents();
+                } else {
+                    document.getElementById('errorMsg').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        }
+        
+        // Logout function
+        function doLogout() {
+            authToken = '';
+            document.getElementById('loginPage').style.display = 'block';
+            document.getElementById('mainDashboard').style.display = 'none';
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('errorMsg').style.display = 'none';
+        }
+        
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Load results
+        async function loadResults() {
+            try {
+                const response = await fetch('/api/results');
+                if (response.ok) {
+                    allResults = await response.json();
+                    renderResults();
+                    updateStats();
+                }
+            } catch (error) {
+                console.error('Error loading results:', error);
+            }
+        }
+        
+        // Load students
+        async function loadStudents() {
+            try {
+                const response = await fetch('/api/students/list', {
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    allStudents = data.students || [];
+                    renderStudents();
+                    updateStats();
+                }
+            } catch (error) {
+                console.error('Error loading students:', error);
+            }
+        }
+        
+        // Render results table
+        function renderResults() {
+            const tbody = document.getElementById('resultsTable');
+            if (allResults.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا توجد نتائج</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = allResults.map((result, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${result.studentName || result.student || 'طالب'}</td>
+                    <td>${result.grade || result.gradeName || result.grade || '-'}</td>
+                    <td>${result.activityName || result.activity || '-'}</td>
+                    <td>${result.score || result.total_score || '0'}</td>
+                    <td>${result.percentage || Math.round((result.score / result.total_questions) * 100) || '0'}%</td>
+                    <td>${result.date || result.activity_date || '-'}</td>
+                </tr>
+            `).join('');
+        }
+        
+        // Render students table
+        function renderStudents() {
+            const tbody = document.getElementById('studentsTable');
+            if (allStudents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">لا يوجد طلاب</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = allStudents.map((student, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${student.first_name} ${student.last_name || ''}</td>
+                    <td>${student.grade}</td>
+                    <td>${student.username || '-'}</td>
+                    <td>${student.created_at || '-'}</td>
+                    <td>
+                        <button class="btn" style="background:#28a745;" onclick="editStudent(${student.id})">تعديل</button>
+                        <button class="btn btn-danger" onclick="deleteStudent(${student.id})">حذف</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Add student
+        async function addStudent() {
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const grade = document.getElementById('grade').value;
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            
+            if (!firstName || !lastName || !grade || !username || !password) {
+                showMessage('جميع الحقول مطلوبة', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/students/create', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify({
+                        firstName,
+                        lastName,
+                        grade: parseInt(grade),
+                        username,
+                        password
+                    })
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    showMessage('تم إضافة الطالب بنجاح!', 'success');
+                    document.getElementById('firstName').value = '';
+                    document.getElementById('lastName').value = '';
+                    document.getElementById('regUsername').value = '';
+                    document.getElementById('regPassword').value = '';
+                    loadStudents();
+                } else {
+                    showMessage('خطأ: ' + (data.error || 'فشل في الإضافة'), 'error');
+                }
+            } catch (error) {
+                showMessage('خطأ في الاتصال', 'error');
+            }
+        }
+        
+        // Edit student
+        async function editStudent(id) {
+            const student = allStudents.find(s => s.id === id);
+            if (!student) return;
+            
+            const firstName = prompt('الاسم الأول:', student.first_name);
+            if (firstName === null) return;
+            const lastName = prompt('الاسم الأخير:', student.last_name || '');
+            if (lastName === null) return;
+            const grade = prompt('الصف:', student.grade);
+            if (grade === null) return;
+            const newUsername = prompt('اسم المستخدم:', student.username);
+            if (newUsername === null) return;
+            const newPassword = prompt('كلمة المرور الجديدة (اتركه فارغاً للحفاظ على القديم):');
+            if (newPassword === null) return;
+            const isActive = prompt('نشط (true/false):', student.is_active !== undefined ? student.is_active : true);
+            
+            if (!firstName || !lastName || !grade || !newUsername) {
+                showMessage('جميع الحقول مطلوبة (ما عدا كلمة المرور)', 'error');
+                return;
+            }
+            
+            try {
+                const body = {
+                    firstName: firstName.trim(),
+                    lastName: lastName.trim(),
+                    grade: parseInt(grade),
+                    username: newUsername.trim()
+                };
+                if (newPassword && newPassword.trim() !== '') {
+                    body.password = newPassword.trim();
+                }
+                body.isActive = isActive !== undefined && isActive.trim().toLowerCase() !== 'false';
+                
+                const response = await fetch('/api/students/' + id, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify(body)
+                });
+                
+                if (response.ok) {
+                    showMessage('تم تعديل الطالب بنجاح', 'success');
+                    loadStudents();
+                } else {
+                    const err = await response.json().catch(() => ({}));
+                    showMessage('خطأ: ' + (err.error || 'فشل التعديل'), 'error');
+                }
+            } catch (error) {
+                showMessage('خطأ في الاتصال', 'error');
+            }
+        }
+        
+        // Delete student
+        async function deleteStudent(id) {
+            if (!confirm('هل أنت متأكد من حذف هذا الطالب؟')) return;
+            
+            try {
+                const response = await fetch('/api/students/' + id, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+                
+                if (response.ok) {
+                    showMessage('تم حذف الطالب بنجاح', 'success');
+                    loadStudents();
+                } else {
+                    showMessage('خطأ في الحذف', 'error');
+                }
+            } catch (error) {
+                showMessage('خطأ في الاتصال', 'error');
+            }
+        }
+        
+        // Show message
+        function showMessage(text, type) {
+            const msg = document.getElementById('addMessage');
+            msg.textContent = text;
+            msg.style.display = 'block';
+            msg.style.backgroundColor = type === 'success' ? '#d4edda' : '#f8d7da';
+            msg.style.color = type === 'success' ? '#155724' : '#721c24';
+            
+            setTimeout(() => {
+                msg.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Update stats
+        function updateStats() {
+            const total = allResults.length;
+            const avg = total ? Math.round(allResults.reduce((sum, r) => sum + (r.percentage || 0), 0) / total) : 0;
+            
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-card">
+                    <h3>${total}</h3>
+                    <p>إجمالي النتائج</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${avg}%</h3>
+                    <p>متوسط النتائج</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${allStudents.length}</h3>
+                    <p>عدد الطلاب</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الصف السابع - المفردات</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#FF6584;--accent:#00C9A7;--wrong:#E74C3C;--bg:#FFF5F7;--card:#FFF;--text:#2D3436;--light:#636E72;--radius:20px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.header{background:linear-gradient(135deg,var(--primary),#E5577A);color:#fff;text-align:center;padding:25px 20px;}
+.back{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;background:rgba(255,255,255,.2);padding:8px 16px;border-radius:12px;margin-bottom:10px;font-weight:600;}
+.container{max-width:750px;margin:0 auto;padding:25px 20px;}
+.question-block{background:var(--card);border-radius:var(--radius);padding:22px;margin-bottom:18px;box-shadow:0 4px 20px rgba(255,101,132,.08);}
+.question-block h4{margin-bottom:6px;}
+.question-block .en-word{direction:ltr;text-align:left;font-size:1.3em;font-weight:700;color:var(--primary);margin:10px 0;}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.option{padding:14px;border:2px solid #FFE0E6;border-radius:14px;cursor:pointer;transition:all .2s;text-align:center;}
+.option:hover{border-color:var(--primary);background:#FFF5F7;}
+.option.selected{border-color:var(--primary);background:#FFE8ED;}
+.option.correct{border-color:var(--accent)!important;background:#E0FFF8!important;color:#00875A;}
+.option.wrong{border-color:var(--wrong)!important;background:#FFE8E8!important;color:#C0392B;}
+.controls{display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap;}
+.btn{padding:14px 36px;border:none;border-radius:14px;font-family:'Tajawal',sans-serif;font-size:1.1em;font-weight:700;cursor:pointer;transition:all .3s;}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#E5577A);color:#fff;box-shadow:0 4px 15px rgba(255,101,132,.4);}
+.btn-secondary{background:#FFE8ED;color:var(--primary);}
+.result-box{background:var(--card);border-radius:var(--radius);padding:30px;text-align:center;box-shadow:0 8px 30px rgba(255,101,132,.15);display:none;margin-top:20px;}
+.result-box .score{font-size:3em;font-weight:900;color:var(--primary);margin:15px 0;}
+.timer{background:rgba(255,255,255,.15);padding:8px 16px;border-radius:10px;display:inline-block;font-weight:700;margin-bottom:15px;}
+</style>
+</head>
+<body>
+<div class="header"><a href="../grade7.html" class="back">→ رجوع</a><h1>📝 المفردات - الصف السابع</h1><div class="timer" id="timer">⏱ 00:00</div></div>
+<div class="container">
+<div id="quiz"></div>
+<div class="controls" id="controls"><button class="btn btn-primary" onclick="submitAnswers()">تسليم ✓</button></div>
+<div class="result-box" id="result"><h2 id="resultTitle"></h2><div class="score" id="scoreDisplay"></div><div id="resultDetails"></div>
+<div class="controls"><button class="btn btn-secondary" onclick="location.reload()">إعادة ↻</button><a href="../grade7.html" class="btn btn-primary">العودة</a></div></div>
+</div>
+<script>
+const words=[{w:'Knowledge',correct:'معرفة',wrong:['جهل','نوم','أكل','لعب']},
+{w:'Beautiful',correct:'جميل',wrong:['قبيح','كبير','طويل','سريع']},
+{w:'Adventure',correct:'مغامرة',wrong:['خوف','ملل','هدوء','نوم']},
+{w:'Dangerous',correct:'خطير',wrong:['آمن','سهل','لطيف','عادي']},
+{w:'Environment',correct:'البيئة',wrong:['المدرسة','البيت','المطبخ','المدينة']},
+{w:'Success',correct:'نجاح',wrong:['فشل','حزن','خوف','غضب']},
+{w:'Responsible',correct:'مسؤول',wrong:['غير مهم','غاضب','سريع','بطيء']},
+{w:'Improve',correct:'يحسّن',wrong:['يضر','يوقف','يمسح','يتحدث']}];
+let answers={};let startTime=Date.now();
+setInterval(()=>{const s=Math.floor((Date.now()-startTime)/1000);document.getElementById('timer').textContent=`⏱ ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;},1000);
+document.getElementById('quiz').innerHTML=words.map((item,i)=>{const opts=[item.correct,...item.wrong.slice(0,3)];
+const shuffled=opts.sort(()=>Math.random()-.5);
+const ci=shuffled.indexOf(item.correct);
+return`<div class="question-block"><h4>${i+1}. ما معنى: <span style="direction:ltr;text-align:left;display:inline-block;">${item.w}</span>؟</h4><div class="options">${shuffled.map((o,j)=>`<div class="option" data-q="${i}" data-a="${j}" onclick="sel(this,${i},${j})">${o}</div>`).join('')}</div></div>`;}).join('');
+function sel(el,q,a){document.querySelectorAll(`.option[data-q="${q}"]`).forEach(o=>o.classList.remove('selected'));el.classList.add('selected');answers[q]=a;}
+function submitAnswers(){let c=0;words.forEach((item,i)=>{const correctIdx=answers[i];const el=document.querySelector(`.option[data-q="${i}"][data-a="${correctIdx}"]`);
+document.querySelectorAll(`.option[data-q="${i}"]`).forEach(o=>{const j=parseInt(o.dataset.a);if(words[i].correct===o.textContent)o.classList.add('correct');if(j===correctIdx&&o.textContent!==words[i].correct)o.classList.add('wrong');o.style.pointerEvents='none';});
+if(el&&el.textContent===words[i].correct)c++;});
+const time=Math.floor((Date.now()-startTime)/1000);const t=words.length,pct=Math.round((c/t)*100);
+document.getElementById('controls').style.display='none';document.getElementById('result').style.display='block';
+document.getElementById('resultTitle').textContent=c===t?'🎉 ممتاز!':'👍 أحسنت!';
+document.getElementById('scoreDisplay').textContent=`${c} / ${t}`;
+document.getElementById('resultDetails').textContent=`النتيجة: ${pct}% | الوقت: ${Math.floor(time/60)} دقيقة و ${time%60} ثانية`;
+save(c,t,pct,time);
+}
+function save(s,t,p,tm){const r={studentName:localStorage.getItem('studentName')||'طالب',grade:7,gradeName:'الصف السابع',activityName:'المفردات',score:s,total_questions:t,percentage:p,time_taken_seconds:tm,date:new Date().toISOString().split('T')[0],submittedAt:new Date().toISOString()};fetch('/api/save-result',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(r)}).catch(()=>{let a=JSON.parse(localStorage.getItem('studentResults')||'[]');a.push(r);localStorage.setItem('studentResults',JSON.stringify(a));});}</script>
+</body>
+</html>

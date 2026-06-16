@@ -1,0 +1,24 @@
+{
+  "name": "english-activities-portal",
+  "version": "2.0.0",
+  "description": "Oman MOE English Activities Portal with Teacher Dashboard",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "db-init": "node scripts/init-db.js",
+    "vercel-build": "echo \"Build complete\""
+  },
+  "dependencies": {
+    "axios": "^1.17.0",
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^12.10.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.21.0",
+    "helmet": "^8.0.0",
+    "morgan": "^1.10.0",
+    "uuid": "^10.0.0"
+  }
+}

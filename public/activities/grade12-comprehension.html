@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الصف الثاني عشر - الفهم</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#FF6584;--accent:#00C9A7;--wrong:#E74C3C;--bg:#FFF5F7;--card:#FFF;--text:#2D3436;--light:#636E72;--radius:20px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.header{background:linear-gradient(135deg,var(--primary),#E5577A);color:#fff;text-align:center;padding:25px 20px;}
+.back{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;background:rgba(255,255,255,.2);padding:8px 16px;border-radius:12px;margin-bottom:10px;font-weight:600;}
+.container{max-width:750px;margin:0 auto;padding:25px 20px;}
+.passage{background:var(--card);border-radius:var(--radius);padding:25px;margin-bottom:24px;box-shadow:0 8px 30px rgba(255,101,132,.12);}
+.passage h3{color:var(--primary);margin-bottom:12px;}
+.passage .en{direction:ltr;text-align:left;line-height:2;}
+.question-block{background:var(--card);border-radius:var(--radius);padding:22px;margin-bottom:18px;box-shadow:0 4px 20px rgba(255,101,132,.08);}
+.question-block h4{margin-bottom:14px;}
+.options{display:flex;flex-direction:column;gap:10px;}
+.option{padding:14px 18px;border:2px solid #FFE0E6;border-radius:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;}
+.option:hover{border-color:var(--primary);background:#FFF5F7;}
+.option.selected{border-color:var(--primary);background:#FFE8ED;}
+.option.correct{border-color:var(--accent)!important;background:#E0FFF8!important;color:#00875A;}
+.option.wrong{border-color:var(--wrong)!important;background:#FFE8E8!important;color:#C0392B;}
+.option .letter{background:#FFE8ED;color:var(--primary);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.controls{display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap;}
+.btn{padding:14px 36px;border:none;border-radius:14px;font-family:'Tajawal',sans-serif;font-size:1.1em;font-weight:700;cursor:pointer;transition:all .3s;}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#E5577A);color:#fff;box-shadow:0 4px 15px rgba(255,101,132,.4);}
+.btn-secondary{background:#FFE8ED;color:var(--primary);}
+.result-box{background:var(--card);border-radius:var(--radius);padding:30px;text-align:center;box-shadow:0 8px 30px rgba(255,101,132,.15);display:none;margin-top:20px;}
+.result-box .score{font-size:3em;font-weight:900;color:var(--primary);margin:15px 0;}
+.timer{background:rgba(255,255,255,.15);padding:8px 16px;border-radius:10px;display:inline-block;font-weight:700;margin-bottom:15px;}
+</style>
+</head>
+<body>
+<div class="header"><a href="../grade12.html" class="back">→ رجوع</a><h1>🧠 الفهم والاستيعاب</h1><div class="timer" id="timer">⏱ 00:00</div></div>
+<div class="container">
+<div class="passage"><h3>📕 اقرأ ثم أجب:</h3><div class="en">
+Many animals live in the desert. Camels are known as the ships of the desert. They can go for a long time without water. Scorpions and snakes also live in hot places. Some animals come out at night to avoid the heat.
+</div></div>
+<div id="quiz"></div>
+<div class="controls" id="controls"><button class="btn btn-primary" onclick="submitAnswers()">تسليم ✓</button></div>
+<div class="result-box" id="result"><h2 id="resultTitle"></h2><div class="score" id="scoreDisplay"></div><div id="resultDetails"></div>
+<div class="controls"><button class="btn btn-secondary" onclick="location.reload()">إعادة ↻</button><a href="../grade12.html" class="btn btn-primary">العودة</a></div></div>
+</div>
+<script>
+const quiz={questions:[
+{text:'What are camels called?',options:['Birds of the sky','Ships of the desert','Friends of the ocean','Guests of the garden'],correct:1},
+{text:'How long can camels go without water?',options:['A few minutes','A short time','A long time','Never without water'],correct:2},
+{text:'What other animals live in the desert?',options:['Fish and dolphins','Scorpions and snakes','Lions and tigers','Penguins and bears'],correct:1},
+{text:'Why do some animals come out at night?',options:['To play','To find food','To avoid the heat','To meet friends'],correct:2}
+],};
+let answers={};let startTime=Date.now();
+setInterval(()=>{const s=Math.floor((Date.now()-startTime)/1000);document.getElementById('timer').textContent=`⏱ ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;},1000);
+const letters=['أ','ب','ج','د'];
+document.getElementById('quiz').innerHTML=quiz.questions.map((q,i)=>`<div class="question-block"><h4>${i+1}. ${q.text}</h4><div class="options">${q.options.map((o,j)=>`<div class="option" data-q="${i}" data-a="${j}" onclick="sel(this,${i},${j})"><span class="letter">${letters[j]}</span><span>${o}</span></div>`).join('')}</div></div>`).join('');
+function sel(el,q,a){document.querySelectorAll(`.option[data-q="${q}"]`).forEach(o=>o.classList.remove('selected'));el.classList.add('selected');answers[q]=a;}
+function submitAnswers(){let c=0;quiz.questions.forEach((q,i)=>{if(answers[i]===q.correct)c++;document.querySelectorAll(`.option[data-q="${i}"]`).forEach(o=>{if(parseInt(o.dataset.a)===q.correct)o.classList.add('correct');if(answers[i]===parseInt(o.dataset.a)&&answers[i]!==q.correct)o.classList.add('wrong');o.style.pointerEvents='none';});});
+const time=Math.floor((Date.now()-startTime)/1000);const t=quiz.questions.length,pct=Math.round((c/t)*100);
+document.getElementById('controls').style.display='none';document.getElementById('result').style.display='block';
+document.getElementById('resultTitle').textContent=c===t?'🎉 ممتاز!':'👍 أحسنت!';
+document.getElementById('scoreDisplay').textContent=`${c} / ${t}`;
+document.getElementById('resultDetails').textContent=`النتيجة: ${pct}% | الوقت: ${Math.floor(time/60)} دقيقة و ${time%60} ثانية`;
+save(c,t,pct,time);
+}
+function save(s,t,p,tm){const r={studentName:localStorage.getItem('studentName')||'طالب',grade:12,gradeName:'الصف الثاني عشر',activityName:'الفهم والاستيعاب',score:s,total_questions:t,percentage:p,time_taken_seconds:tm,date:new Date().toISOString().split('T')[0],submittedAt:new Date().toISOString()};fetch('/api/save-result',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(r)}).catch(()=>{let a=JSON.parse(localStorage.getItem('studentResults')||'[]');a.push(r);localStorage.setItem('studentResults',JSON.stringify(a));});}</script>
+</body>
+</html>

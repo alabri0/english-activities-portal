@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الصف السادس - القواعد</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#FF6584;--accent:#00C9A7;--wrong:#E74C3C;--bg:#FFF5F7;--card:#FFF;--text:#2D3436;--light:#636E72;--radius:20px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.header{background:linear-gradient(135deg,var(--primary),#E5577A);color:#fff;text-align:center;padding:25px 20px;}
+.back{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;background:rgba(255,255,255,.2);padding:8px 16px;border-radius:12px;margin-bottom:10px;font-weight:600;}
+.container{max-width:750px;margin:0 auto;padding:25px 20px;}
+.question-block{background:var(--card);border-radius:var(--radius);padding:22px;margin-bottom:18px;box-shadow:0 4px 20px rgba(255,101,132,.08);}
+.question-block h4{margin-bottom:14px;}
+.question-block .sentence{direction:ltr;text-align:left;font-size:1.15em;font-weight:600;margin-bottom:12px;padding:10px 15px;background:#FFF5F7;border-radius:10px;}
+.options{display:flex;flex-wrap:wrap;gap:10px;}
+.option{padding:12px 20px;border:2px solid #FFE0E6;border-radius:14px;cursor:pointer;transition:all .2s;font-size:1em;min-width:100px;text-align:center;}
+.option:hover{border-color:var(--primary);background:#FFF5F7;}
+.option.selected{border-color:var(--primary);background:#FFE8ED;}
+.option.correct{border-color:var(--accent)!important;background:#E0FFF8!important;color:#00875A;}
+.option.wrong{border-color:var(--wrong)!important;background:#FFE8E8!important;color:#C0392B;}
+.controls{display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap;}
+.btn{padding:14px 36px;border:none;border-radius:14px;font-family:'Tajawal',sans-serif;font-size:1.1em;font-weight:700;cursor:pointer;transition:all .3s;}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#E5577A);color:#fff;box-shadow:0 4px 15px rgba(255,101,132,.4);}
+.btn-secondary{background:#FFE8ED;color:var(--primary);}
+.result-box{background:var(--card);border-radius:var(--radius);padding:30px;text-align:center;box-shadow:0 8px 30px rgba(255,101,132,.15);display:none;margin-top:20px;}
+.result-box .score{font-size:3em;font-weight:900;color:var(--primary);margin:15px 0;}
+.timer{background:rgba(255,255,255,.15);padding:8px 16px;border-radius:10px;display:inline-block;font-weight:700;margin-bottom:15px;}
+</style>
+</head>
+<body>
+<div class="header"><a href="../grade6.html" class="back">→ رجوع</a><h1>✏️ القواعد - الصف السادس</h1><div class="timer" id="timer">⏱ 00:00</div></div>
+<div class="container">
+<div id="quiz"></div>
+<div class="controls" id="controls"><button class="btn btn-primary" onclick="submitAnswers()">تسليم ✓</button></div>
+<div class="result-box" id="result"><h2 id="resultTitle"></h2><div class="score" id="scoreDisplay"></div><div id="resultDetails"></div>
+<div class="controls"><button class="btn btn-secondary" onclick="location.reload()">إعادة ↻</button><a href="../grade6.html" class="btn btn-primary">العودة</a></div></div>
+</div>
+<script>
+const quiz={questions:[
+{sentence:'She ________ to school every day.',options:['go','goes','going','gone'],correct:1},
+{sentence:'They ________ played football yesterday.',options:['have','has','had been','is'],correct:0},
+{sentence:'If it rains, I ________ stay home.',options:['will','would','am','do'],correct:0},
+{sentence:'He is the ________ student in class.',options:['smart','smarter','smartest','more smart'],correct:2},
+{sentence:'The book ________ the table is mine.',options:['in','on','at','to'],correct:1},
+{sentence:'I have ________ finished my homework.',options:['just','already','still','yet'],correct:0}
+],};
+let answers={};let startTime=Date.now();
+setInterval(()=>{const s=Math.floor((Date.now()-startTime)/1000);document.getElementById('timer').textContent=`⏱ ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;},1000);
+document.getElementById('quiz').innerHTML=quiz.questions.map((q,i)=>`<div class="question-block"><h4>${i+1}. أكمل الجملة:</h4><div class="sentence">${q.sentence}</div><div class="options">${q.options.map((o,j)=>`<div class="option" data-q="${i}" data-a="${j}" onclick="sel(this,${i},${j})">${o}</div>`).join('')}</div></div>`).join('');
+function sel(el,q,a){document.querySelectorAll(`.option[data-q="${q}"]`).forEach(o=>o.classList.remove('selected'));el.classList.add('selected');answers[q]=a;}
+function submitAnswers(){let c=0;quiz.questions.forEach((q,i)=>{if(answers[i]===q.correct)c++;document.querySelectorAll(`.option[data-q="${i}"]`).forEach(o=>{if(parseInt(o.dataset.a)===q.correct)o.classList.add('correct');if(answers[i]===parseInt(o.dataset.a)&&answers[i]!==q.correct)o.classList.add('wrong');o.style.pointerEvents='none';});});
+const time=Math.floor((Date.now()-startTime)/1000);const t=quiz.questions.length,pct=Math.round((c/t)*100);
+document.getElementById('controls').style.display='none';document.getElementById('result').style.display='block';
+document.getElementById('resultTitle').textContent=c===t?'🎉 ممتاز!':'👍 أحسنت!';
+document.getElementById('scoreDisplay').textContent=`${c} / ${t}`;
+document.getElementById('resultDetails').textContent=`النتيجة: ${pct}% | الوقت: ${Math.floor(time/60)} دقيقة و ${time%60} ثانية`;
+save(c,t,pct,time);
+}
+function save(s,t,p,tm){const r={studentName:localStorage.getItem('studentName')||'طالب',grade:6,gradeName:'الصف السادس',activityName:'القواعد',score:s,total_questions:t,percentage:p,time_taken_seconds:tm,date:new Date().toISOString().split('T')[0],answers,submittedAt:new Date().toISOString()};fetch('/api/save-result',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(r)}).catch(()=>{let a=JSON.parse(localStorage.getItem('studentResults')||'[]');a.push(r);localStorage.setItem('studentResults',JSON.stringify(a));});}
+</script>
+</body>
+</html>

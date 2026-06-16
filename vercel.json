@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/index.js", "use": "@vercel/node" },
+    { "src": "admin.js", "use": "@vercel/node" },
+    { "src": "public/**/*.html", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.js" },
+    { "src": "/admin", "dest": "/admin.js" },
+    { "src": "/student", "dest": "/api/index.js" },
+    { "src": "/student/dashboard", "dest": "/api/index.js" },
+    { "src": "/(.*)", "dest": "/public/$1" }
+  ]
+}

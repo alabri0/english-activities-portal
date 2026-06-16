@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الصف {GRADE} - ترتيب الحروف</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#6C63FF;--primary-dark:#5A52D5;--accent:#00C9A7;--wrong:#FF6584;--bg:#F0F2FF;--card:#FFF;--text:#2D3436;--light:#636E72;--radius:20px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;text-align:center;padding:25px 20px;}
+.back{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;background:rgba(255,255,255,.2);padding:8px 16px;border-radius:12px;margin-bottom:10px;font-weight:600;font-size:.95em;}
+.container{max-width:800px;margin:0 auto;padding:25px 20px;}
+.instruction{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:24px;box-shadow:0 8px 30px rgba(108,99,255,.12);text-align:center;}
+.instruction h3{color:var(--primary);margin-bottom:8px;font-size:1.15em;}
+.instruction p{color:var(--light);font-size:.95em;}
+.hint-box{background:#FFF8E1;border:2px solid #FFD54F;border-radius:14px;padding:14px 20px;margin-bottom:24px;text-align:center;font-size:1.05em;color:#5D4037;}
+.scramble-card{background:var(--card);border-radius:var(--radius);padding:24px;margin-bottom:18px;box-shadow:0 4px 20px rgba(108,99,255,.08);transition:all .3s;}
+.scramble-card.answered{opacity:.85;}
+.scramble-card.correct-card{border:2px solid var(--accent);background:#E8FFF5;}
+.scramble-card.wrong-card{border:2px solid var(--wrong);background:#FFF0F3;}
+.scramble-num{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;background:var(--primary);color:#fff;border-radius:50%;font-weight:700;font-size:.9em;margin-left:10px;}
+.scramble-word{display:flex;gap:6px;justify-content:center;direction:ltr;margin:16px 0;flex-wrap:wrap;}
+.letter-box{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;border-radius:12px;font-size:1.3em;font-weight:700;box-shadow:0 3px 10px rgba(108,99,255,.3);user-select:none;}
+.letter-box.revealed{background:linear-gradient(135deg,var(--accent),#00896A);}
+.letter-box.wrong-box{background:linear-gradient(135deg,var(--wrong),#C0392B);}
+.answer-input{width:100%;padding:14px 18px;border:2px solid #E8E8FF;border-radius:14px;font-size:1.1em;font-family:'Tajawal',sans-serif;text-align:center;direction:ltr;outline:none;transition:all .3s;background:#FAFAFA;}
+.answer-input:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(108,99,255,.1);}
+.answer-input:disabled{background:#F5F5F5;opacity:.7;}
+.score-row{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:12px;}
+.hint-btn{background:none;border:2px dashed #FFD54F;color:#5D4037;padding:6px 16px;border-radius:10px;cursor:pointer;font-family:'Tajawal',sans-serif;font-weight:600;font-size:.9em;transition:all .3s;}
+.hint-btn:hover{background:#FFF8E1;}
+.hint-text{color:#E65100;font-size:.9em;margin-top:8px;font-weight:600;}
+.controls{display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap;}
+.btn{padding:14px 36px;border:none;border-radius:14px;font-family:'Tajawal',sans-serif;font-size:1.1em;font-weight:700;cursor:pointer;transition:all .3s;}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;box-shadow:0 4px 15px rgba(108,99,255,.4);}
+.btn-primary:hover{transform:translateY(-2px);}
+.btn-secondary{background:#EDE9FF;color:var(--primary);}
+.btn-hint{background:#FFF8E1;color:#E65100;}
+.result-box{background:var(--card);border-radius:var(--radius);padding:30px;text-align:center;box-shadow:0 8px 30px rgba(108,99,255,.15);display:none;margin-top:20px;}
+.result-box .score{font-size:3em;font-weight:900;color:var(--primary);margin:15px 0;}
+.result-box .details{color:var(--light);font-size:1.05em;margin-bottom:20px;}
+.progress-bar{background:var(--card);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px;box-shadow:0 4px 15px rgba(0,0,0,.06);}
+.progress-top{display:flex;justify-content:space-between;margin-bottom:8px;font-weight:600;font-size:.95em;}
+.progress-track{height:10px;background:#F0F0F0;border-radius:5px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:5px;transition:width .4s ease;}
+.confetti{position:fixed;top:-10px;pointer-events:none;font-size:1.5em;z-index:999;animation:fall 3s ease-in forwards;}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0;}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.animate{animation:fadeInUp .5s ease forwards;}
+.shuffle-btn{background:none;border:none;cursor:pointer;font-size:1.2em;padding:4px;transition:transform .3s;}
+.shuffle-btn:hover{transform:rotate(180deg);}
+@media(max-width:600px){.letter-box{width:36px;height:36px;font-size:1.1em;}}
+</style>
+</head>
+<body>
+<div class="header">
+<a href="../grade{GRADE}.html" class="back">→ رجوع</a>
+<h1>🔤 ترتيب الحروف - الصف {GRADE_TITLE}</h1>
+</div>
+<div class="container">
+<div class="instruction">
+<h3>🎯 {CATEGORY_TITLE}</h3>
+<p>رتّب الحروف المبعثرة لتكوّن الكلمة الصحيحة</p>
+</div>
+<div class="progress-bar">
+<div class="progress-top"><span id="progressText">0 من {TOTAL} مكتمل</span><span id="progressPct">0%</span></div>
+<div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+<div id="scrambleCards"></div>
+<div class="controls" id="controls">
+<button class="btn btn-primary" onclick="submitAnswers()">تسليم ✓</button>
+<button class="btn btn-hint" onclick="revealAll()">💡 إظهار الحل</button>
+<button class="btn btn-secondary" onclick="resetActivity()">إعادة ↺</button>
+</div>
+<div class="result-box" id="result">
+<h2 id="resultTitle"></h2>
+<div class="score" id="scoreDisplay"></div>
+<div class="details" id="resultDetails"></div>
+<div class="controls">
+<button class="btn btn-primary" onclick="resetActivity()">حاول مرة أخرى ↺</button>
+<button class="btn btn-secondary" onclick="goBack()">← رجوع</button>
+</div>
+</div>
+</div>
+<script>
+// ===== CONFIG: Each grade gets unique words =====
+const ACTIVITY_DATA = {
+  GRADE: [
+    // Format: { word: "correctWord", hint: "Arabic hint" }
+    { word: "", hint: "" },
+  ]
+};
+const GRADE_NUM = {GRADE};
+const GRADE_DATA = ACTIVITY_DATA[GRADE_NUM] || ACTIVITY_DATA[1];
+
+let answers = {};
+let totalWords = GRADE_DATA.length;
+
+// Shuffle an array in place
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Create scrambled version of a word
+function scrambleWord(word) {
+  let letters = word.split('');
+  let scrambled;
+  do {
+    scrambled = shuffle([...letters]);
+  } while (scrambled.join('').toLowerCase() === word.toLowerCase() && letters.length > 2);
+  return scrambled;
+}
+
+// Initialize
+function init() {
+  const container = document.getElementById('scrambleCards');
+  container.innerHTML = '';
+
+  GRADE_DATA.forEach((item, idx) => {
+    const letters = scrambleWord(item.word);
+    let letterBoxes = '';
+    letters.forEach((l, li) => {
+      letterBoxes += `<span class="letter-box" id="letter-${idx}-${li}" data-correct="${item.word.toLowerCase()}" data-index="${li}">${l}</span>`;
+    });
+
+    const card = document.createElement('div');
+    card.className = 'scramble-card';
+    card.id = `card-${idx}`;
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;margin-bottom:6px;">
+        <span class="scramble-num">${idx + 1}</span>
+        <span style="font-weight:700;color:var(--text);">الكلمة ${idx + 1}</span>
+      </div>
+      <div class="scramble-word" id="scramble-${idx}">${letterBoxes}</div>
+      <div class="score-row">
+        <input type="text" class="answer-input" id="answer-${idx}" placeholder="اكتب الكلمة الصحيحة هنا..." autocomplete="off" dir="ltr" oninput="updateProgress()">
+        <button class="hint-btn" onclick="showHint(${idx})">💡 تلميح</button>
+      </div>
+      <div class="hint-text" id="hint-${idx}" style="display:none;">المعنى: ${item.hint}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function showHint(idx) {
+  const hintEl = document.getElementById(`hint-${idx}`);
+  hintEl.style.display = hintEl.style.display === 'none' ? 'block' : 'none';
+}
+
+function updateProgress() {
+  let filled = 0;
+  for (let i = 0; i < totalWords; i++) {
+    if (document.getElementById(`answer-${i}`).value.trim()) filled++;
+  }
+  const pct = Math.round((filled / totalWords) * 100);
+  document.getElementById('progressText').textContent = `${filled} من ${totalWords} مكتمل`;
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function submitAnswers() {
+  let correctCount = 0;
+
+  for (let i = 0; i < totalWords; i++) {
+    const input = document.getElementById(`answer-${i}`);
+    const card = document.getElementById(`card-${i}`);
+    const userAnswer = input.value.trim().toLowerCase();
+    const correctAnswer = GRADE_DATA[i].word.toLowerCase();
+
+    input.disabled = true;
+
+    if (userAnswer === correctAnswer) {
+      correctCount++;
+      card.classList.add('correct-card');
+    } else {
+      card.classList.add('wrong-card');
+      // Show correct answer
+      input.value = GRADE_DATA[i].word;
+      input.style.borderColor = 'var(--wrong)';
+    }
+  }
+
+  const percentage = Math.round((correctCount / totalWords) * 100);
+
+  document.getElementById('controls').style.display = 'none';
+  const resultBox = document.getElementById('result');
+  resultBox.style.display = 'block';
+  resultBox.classList.add('animate');
+
+  document.getElementById('resultTitle').textContent = percentage >= 80 ? '🎉 ممتاز!' : percentage >= 50 ? '👍 جيد!' : '💪 حاول مرة أخرى!';
+  document.getElementById('scoreDisplay').textContent = percentage + '%';
+  document.getElementById('resultDetails').textContent = `أجبت على ${correctCount} من ${totalWords} بشكل صحيح`;
+
+  if (percentage >= 80) spawnConfetti();
+
+  saveResult(percentage, correctCount, totalWords, 'ترتيب_الحروف');
+}
+
+function revealAll() {
+  for (let i = 0; i < totalWords; i++) {
+    document.getElementById(`answer-${i}`).value = GRADE_DATA[i].word;
+  }
+  updateProgress();
+}
+
+function resetActivity() {
+  for (let i = 0; i < totalWords; i++) {
+    const input = document.getElementById(`answer-${i}`);
+    if (input) input.disabled = false;
+  }
+  document.getElementById('controls').style.display = 'flex';
+  document.getElementById('result').style.display = 'none';
+  init();
+}
+
+function goBack() {
+  window.location.href = `../grade{GRADE}.html`;
+}
+
+function spawnConfetti() {
+  const emojis = ['🎉','⭐','🌟','✨','🎊','💯'];
+  for (let i = 0; i < 20; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.animationDuration = (2 + Math.random() * 2) + 's';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }, i * 100);
+  }
+}
+
+function saveResult(percentage, correct, total, type) {
+  try {
+    const token = localStorage.getItem('studentToken');
+    const grade = localStorage.getItem('studentGrade');
+    if (!token) return;
+    fetch(`${window.location.origin}/api/activities/save-result`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Cookie': 'token=' + token },
+      body: JSON.stringify({
+        grade: parseInt(grade),
+        activity_type: type,
+        score: correct,
+        total_questions: total,
+        percentage: percentage,
+        sectionReading: 0, sectionComprehension: 0, sectionGrammar: 0,
+        sectionVocabulary: correct, sectionHandwriting: 0,
+        activity_date: new Date().toLocaleDateString('ar-EG')
+      })
+    }).catch(() => {});
+  } catch(e) {}
+}
+
+init();
+</script>
+</body>
+</html>
