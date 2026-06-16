@@ -38,13 +38,24 @@ module.exports = async function handler(req, res) {
     return res.status(200).end();
   }
 
-  let body = {};
-  if (['POST', 'PUT'].includes(req.method)) {
-    let data = '';
-    req.on('data', chunk => { data += chunk; });
-    req.on('end', () => {
-      try { body = JSON.parse(data); } catch(e) { body = {}; }
-    });
+  // Parse body - use rawBody (Vercel provides this) or stream
+  let body = req.body || {};
+  if ((!body || Object.keys(body).length === 0) && (req.method === 'POST' || req.method === 'PUT')) {
+    try {
+      if (req.rawBody) {
+        body = JSON.parse(req.rawBody);
+      }
+    } catch(e) {
+      // Try reading from _readable
+      try {
+        const chunks = [];
+        let totalLen = 0;
+        req.on('data', chunk => { chunks.push(chunk); totalLen += chunk.length; });
+        req.on('end', () => {
+          try { body = JSON.parse(Buffer.concat(chunks, totalLen).toString('utf8')); } catch(e2) { body = {}; }
+        });
+      } catch(e2) { body = {}; }
+    }
   }
 
   // TEACHER LOGIN
@@ -75,10 +86,10 @@ module.exports = async function handler(req, res) {
       const db = loadData();
       const { firstName, lastName, grade, username, password } = body;
       if (!firstName || !lastName || !grade || !username || !password) {
-        return res.status(400).json({ error: 'جميع الحقول مطلوبة' });
+        return res.status(400).json({ error: 'All fields required. Got: ' + JSON.stringify(body) });
       }
       if ((db.students || []).find(s => s.username === username)) {
-        return res.status(409).json({ error: 'اسم المستخدم موجود مسبقاَ' });
+        return res.status(409).json({ error: 'Username already exists' });
       }
       const newStudent = {
         id: (db.students ? db.students.length : 0) + 1,
@@ -115,7 +126,7 @@ module.exports = async function handler(req, res) {
       const id = parseInt(req.url.split('/').pop());
       const db = loadData();
       const idx = (db.students || []).findIndex(s => s.id === id);
-      if (idx === -1) return res.status(404).json({ error: 'الطالب غير موجود' });
+      if (idx === -1) return res.status(404).json({ error: 'Student not found' });
       if (body.firstName) db.students[idx].first_name = body.firstName.trim();
       if (body.lastName) db.students[idx].last_name = body.lastName.trim();
       if (body.grade) db.students[idx].grade = parseInt(body.grade);
@@ -136,7 +147,7 @@ module.exports = async function handler(req, res) {
       const id = parseInt(req.url.split('/').pop());
       const db = loadData();
       const index = (db.students || []).findIndex(s => s.id === id);
-      if (index === -1) return res.status(404).json({ error: 'الطالب غير موجود' });
+      if (index === -1) return res.status(404).json({ error: 'Student not found' });
       db.students.splice(index, 1);
       saveData(db);
       return res.status(200).json({ success: true });
@@ -165,7 +176,7 @@ module.exports = async function handler(req, res) {
       studentName: r.student_name || 'طالب',
       grade: r.grade,
       gradeName: 'الصف ' + r.grade,
-      activityName: 'نشاط إنجليزي',
+      activityName: 'نشاط انجليزي',
       score: r.total_score,
       total_questions: r.total_questions,
       percentage: r.total_questions ? Math.round((r.total_score / r.total_questions) * 100) : 0,
