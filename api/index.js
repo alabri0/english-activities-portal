@@ -1,7 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
-const DATA_FILE = path.join(__dirname, '..', 'data.json');
+// Use /tmp for Vercel serverless (read-write) or __dirname for local dev
+const DATA_FILE = process.env.NODE_ENV === 'production'
+  ? '/tmp/data.json'
+  : path.join(__dirname, '..', 'data.json');
+
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 
 function loadData() {
@@ -14,7 +18,11 @@ function loadData() {
 }
 
 function saveData(data) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+  try {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+  } catch (e) {
+    console.error('saveData error:', e.message);
+  }
 }
 
 function readStaticFile(filename) {
@@ -38,7 +46,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Parse body - use rawBody (Vercel provides this) or stream
+  // Parse body - Vercel provides req.body for @vercel/node
   let body = req.body || {};
   if ((!body || Object.keys(body).length === 0) && (req.method === 'POST' || req.method === 'PUT')) {
     try {
@@ -46,7 +54,7 @@ module.exports = async function handler(req, res) {
         body = JSON.parse(req.rawBody);
       }
     } catch(e) {
-      // Try reading from _readable
+      // Fallback: try stream
       try {
         const chunks = [];
         let totalLen = 0;
