@@ -29,23 +29,10 @@ function readStaticFile(filename) {
   }
 }
 
-// Rate limiter (simple in-memory implementation for serverless)
-const requestCounts = {};
-function checkRateLimit(ip, maxRequests = 10, windowMs = 15 * 60 * 1000) {
-  const now = Date.now();
-  if (!requestCounts[ip]) {
-    requestCounts[ip] = [];
-  }
-  // Clean old entries
-  requestCounts[ip] = requestCounts[ip].filter(t => now - t < windowMs);
-  if (requestCounts[ip].length >= maxRequests) {
-    return false;
-  }
-  requestCounts[ip].push(now);
   return true;
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -53,16 +40,6 @@ export default async function handler(req, res) {
   
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
-  }
-
-  // Get client IP
-  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
-  
-  // Rate limit for sensitive endpoints
-  if ((req.url.startsWith('/api/students/create') || req.url.startsWith('/api/teacher/login'))) {
-    if (!checkRateLimit(ip, 5, 15 * 60 * 1000)) {
-      return res.status(429).json({ error: 'Too many requests' });
-    }
   }
 
   // Routes
