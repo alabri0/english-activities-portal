@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نتائجي | بوابة الطلاب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary:#6C63FF; --primary-dark:#5A52D5; --secondary:#FF6584; --accent:#00C9A7; --bg:#F0F2FF; --card:#FFF; --text:#2D3436; --light:#636E72; --shadow:0 10px 40px rgba(108,99,255,.15); --radius:20px; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Tajawal',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+        .header { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; text-align:center; padding:25px 20px; }
+        .back { display:inline-flex; align-items:center; gap:6px; color:#fff; text-decoration:none; background:rgba(255,255,255,.2); padding:8px 16px; border-radius:12px; margin-bottom:10px; font-weight:600; }
+        .container { max-width:900px; margin:0 auto; padding:25px 20px; }
+        .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:24px; }
+        .stat-card { background:var(--card); border-radius:var(--radius); padding:20px; text-align:center; box-shadow:var(--shadow); }
+        .stat-card .num { font-size:2.5em; font-weight:900; color:var(--primary); }
+        .stat-card .label { color:var(--light); font-size:.95em; margin-top:4px; }
+        .stat-card.accent .num { color:var(--accent); }
+        .stat-card.secondary .num { color:var(--secondary); }
+        .section-title { font-size:1.3em; font-weight:800; margin:24px 0 16px; color:var(--text); display:flex; align-items:center; gap:8px; }
+        .activity-bars { display:flex; flex-direction:column; gap:12px; margin-bottom:24px; }
+        .activity-bar { background:var(--card); border-radius:14px; padding:16px 20px; box-shadow:0 4px 15px rgba(0,0,0,.06); }
+        .activity-bar .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+        .activity-bar .name { font-weight:700; font-size:1.05em; }
+        .activity-bar .pct { font-weight:800; font-size:1.1em; }
+        .bar-bg { height:12px; background:#F0F0F0; border-radius:6px; overflow:hidden; }
+        .bar-fill { height:100%; border-radius:6px; transition:width .6s ease; }
+        .results-table { background:var(--card); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); }
+        .results-table table { width:100%; border-collapse:collapse; }
+        .results-table th { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; padding:14px 12px; font-size:.9em; }
+        .results-table td { padding:12px; text-align:center; border-bottom:1px solid #F0F0F0; font-size:.9em; }
+        .results-table tr:hover td { background:#F8F7FF; }
+        .score-good { color:var(--accent); font-weight:700; }
+        .score-mid { color:#FFB347; font-weight:700; }
+        .score-bad { color:var(--secondary); font-weight:700; }
+        .no-data { text-align:center; padding:60px; color:var(--light); }
+        .loading { text-align:center; padding:40px; color:var(--light); }
+        .logout-btn { display:block; margin:20px auto 0; padding:10px 24px; background:rgba(255,255,255,.2); color:#fff; border:none; border-radius:10px; font-family:'Tajawal',sans-serif; font-weight:600; cursor:pointer; font-size:.95em; }
+        @media(max-width:600px) { .stats { grid-template-columns:repeat(2,1fr); } .results-table { overflow-x:auto; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="student-portal.html" class="back">→ العودة</a>
+        <h1>📊 نتائجي وتقدمي</h1>
+        <p>تابع أداءك في الأنشطة</p>
+        <button class="logout-btn" onclick="logout()">تسجيل خروج</button>
+    </div>
+    <div class="container">
+        <div class="stats" id="stats">
+            <div class="stat-card"><div class="num" id="totalActivities">-</div><div class="label">إجمالي الأنشطة</div></div>
+            <div class="stat-card accent"><div class="num" id="avgScore">-</div><div class="label">متوسط النسبة المئوية</div></div>
+            <div class="stat-card secondary"><div class="num" id="bestScore">-</div><div class="label">أعلى نتيجة</div></div>
+            <div class="stat-card"><div class="num" id="lastActivity">-</div><div class="label">آخر نشاط</div></div>
+        </div>
+
+        <div class="section-title">📈 النتائج حسب النوع</div>
+        <div class="activity-bars" id="activityBars">
+            <div class="loading">جاري تحميل النتائج...</div>
+        </div>
+
+        <div class="section-title">📋 سجل الأنشطة</div>
+        <div class="results-table" id="resultsContainer">
+            <div class="loading" id="loading">جاري تحميل السجل...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        const token = localStorage.getItem('studentToken');
+        const grade = localStorage.getItem('studentGrade');
+
+        if (!token) {
+            window.location.href = 'student-portal.html';
+        }
+
+        let allResults = [];
+
+        async function loadResults() {
+            try {
+                let res = await fetch(`${API_BASE}/api/activities/results?limit=50`, {
+                    headers: { 'Cookie': 'token=' + token }
+                });
+                // Try Bearer token if cookie failed
+                if (!res.ok) {
+                    res = await fetch(`${API_BASE}/api/activities/results?limit=50`, {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                }
+                if (res.ok) {
+                    const data = await res.json();
+                    allResults = data.results || [];
+                } else {
+                    // Fallback to localStorage
+                    allResults = JSON.parse(localStorage.getItem('studentResults') || '[]')
+                        .filter(r => r.grade === parseInt(grade));
+                }
+                renderAll();
+            } catch(e) {
+                allResults = JSON.parse(localStorage.getItem('studentResults') || '[]')
+                    .filter(r => r.grade === parseInt(grade));
+                renderAll();
+            }
+        }
+
+        function renderAll() {
+            if (allResults.length === 0) {
+                document.getElementById('loading').textContent = 'لا توجد أنشطة مسجلة بعد. ابدأ حل الأنشطة!';
+                document.getElementById('resultsContainer').innerHTML = '<div class="no-data">لا توجد أنشطة مسجلة بعد 📝<br><br>ابدأ بحل الأنشطة من صفحة الأنشطة وستظهر نتائجك هنا!</div>';
+                return;
+            }
+
+            // Overall stats
+            const total = allResults.length;
+            const avgPct = Math.round(allResults.reduce((s, r) => s + (r.percentage || 0), 0) / total);
+            const best = Math.max(...allResults.map(r => r.percentage || 0));
+            const lastDate = allResults[0]?.date || '-';
+
+            document.getElementById('totalActivities').textContent = total;
+            document.getElementById('avgScore').textContent = avgPct + '%';
+            document.getElementById('bestScore').textContent = best + '%';
+            document.getElementById('lastActivity').textContent = lastDate;
+
+            // Average by section
+            const sections = [
+                { key: 'sectionReading', name: '📖 القراءة' },
+                { key: 'sectionComprehension', name: '🧠 الفهم والاستيعاب' },
+                { key: 'sectionGrammar', name: '✏️ القواعد' },
+                { key: 'sectionVocabulary', name: '📝 المفردات' },
+                { key: 'sectionHandwriting', name: '✍️ الكتابة اليدوية' },
+            ];
+
+            const barsContainer = document.getElementById('activityBars');
+            let barsHTML = '';
+            sections.forEach(sec => {
+                const validResults = allResults.filter(r => r[sec.key] !== undefined && r.total_questions > 0);
+                if (validResults.length > 0) {
+                    const avg = validResults.reduce((s, r) => s + r[sec.key], 0) / validResults.length;
+                    const maxScore = validResults.length * 10; // approximate max per section
+                    const pct = Math.round((avg / maxScore) * 100);
+                    const color = pct >= 80 ? '#00C9A7' : pct >= 50 ? '#FFB347' : '#FF6584';
+                    barsHTML += `
+                        <div class="activity-bar">
+                            <div class="top">
+                                <span class="name">${sec.name}</span>
+                                <span class="pct" style="color:${color}">${pct}%</span>
+                            </div>
+                            <div class="bar-bg">
+                                <div class="bar-fill" style="width:${pct}%;background:${color}"></div>
+                            </div>
+                        </div>`;
+                }
+            });
+            barsContainer.innerHTML = barsHTML || '<div class="no-data">لا توجد بيانات كافية</div>';
+
+            // Results table
+            let tableHTML = '<table><thead><tr><th>#</th><th>النشاط</th><th>النتيجة</th><th>النسبة</th><th>التاريخ</th></tr></thead><tbody>';
+            allResults.forEach((r, i) => {
+                const pct = r.percentage || 0;
+                const cls = pct >= 80 ? 'score-good' : pct >= 50 ? 'score-mid' : 'score-bad';
+                const activityNames = {
+                    1: 'القراءة', 2: 'الكتابة اليدوية', 3: 'الفهم والاستيعاب', 4: 'القواعد', 5: 'المفردات'
+                };
+                // Try to determine activity name from sections
+                let actName = 'نشاط';
+                if (r.sectionReading > 0) actName = '📖 القراءة';
+                else if (r.sectionComprehension > 0) actName = '🧠 الفهم';
+                else if (r.sectionGrammar > 0) actName = '✏️ القواعد';
+                else if (r.sectionVocabulary > 0) actName = '📝 المفردات';
+                else if (r.sectionHandwriting > 0) actName = '✍️ الكتابة';
+
+                tableHTML += `<tr>
+                    <td>${i + 1}</td>
+                    <td>${actName}</td>
+                    <td>${r.total_score || '-'} / ${r.total_questions || '-'}</td>
+                    <td class="${cls}">${pct}%</td>
+                    <td>${r.activity_date || r.date || '-'}</td>
+                </tr>`;
+            });
+            tableHTML += '</tbody></table>';
+            document.getElementById('resultsContainer').innerHTML = tableHTML;
+        }
+
+        function logout() {
+            localStorage.removeItem('studentToken');
+            localStorage.removeItem('studentId');
+            localStorage.removeItem('studentGrade');
+            window.location.href = 'student-portal.html';
+        }
+
+        loadResults();
+    </script>
+</body>
+</html>

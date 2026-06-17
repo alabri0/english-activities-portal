@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بوابة الأنشطة الإنجليزية | Grade 2 & 6</title>
+    <title>بوابة الأنشطة الإنجليزية | الصف الأول - الثاني عشر</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -29,6 +29,13 @@
         .btn { padding:14px 32px; border:none; border-radius:14px; font-family:'Tajawal',sans-serif; font-size:1.1em; font-weight:700; cursor:pointer; transition:all .3s; }
         .btn-primary { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; box-shadow:0 4px 15px rgba(108,99,255,.4); }
         .btn-primary:hover { transform:translateY(-2px); }
+        .grade-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:15px; margin:30px 0; }
+        .grade-card { background:var(--card); border-radius:var(--radius); padding:20px 15px; text-align:center; box-shadow:var(--shadow); cursor:pointer; transition:all .3s; }
+        .grade-card:hover { transform:translateY(-5px); box-shadow:0 15px 40px rgba(108,99,255,.2); }
+        .grade-card .icon { font-size:2em; display:block; margin-bottom:8px; }
+        .grade-card h3 { font-size:1em; font-weight:700; color:var(--text); margin-bottom:4px; }
+        .grade-card p { font-size:.8em; color:var(--light); }
+        .section-title { text-align:center; font-size:1.3em; font-weight:800; color:var(--primary); margin:20px 0 10px; }
         .admin-link { text-align:center; margin-top:40px; }
         .admin-link a { display:inline-flex; align-items:center; gap:8px; color:var(--light); text-decoration:none; font-weight:600; padding:12px 24px; border:2px solid #E8E8FF; border-radius:14px; transition:all .3s; }
         .admin-link a:hover { border-color:var(--primary); color:var(--primary); }
@@ -58,9 +65,40 @@
             <button class="btn btn-primary" onclick="window.location.href='student-portal.html'" style="max-width:300px;margin:0 auto;display:block;">🔑 تسجيل دخول الطالب</button>
         </div>
 
-        <div class="admin-link animate-in delay-1">
-            <a href="admin.html">🔧 لوحة تحكم المشرف</a>
+        <div style="display:flex; gap:15px; justify-content:center; margin-top:30px; flex-wrap:wrap;" class="animate-in delay-1">
+            <a href="admin.html" style="display:inline-flex; align-items:center; gap:8px; color:var(--primary); text-decoration:none; font-weight:700; padding:14px 28px; border:2px solid var(--primary); border-radius:14px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff; box-shadow:0 4px 15px rgba(108,99,255,.4); transition:all .3s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+                🔧 لوحة تحكم المشرف
+            </a>
+            <a href="student-portal.html" style="display:inline-flex; align-items:center; gap:8px; color:var(--primary); text-decoration:none; font-weight:700; padding:14px 28px; border:2px solid var(--primary); border-radius:14px; background:#fff; box-shadow:0 4px 15px rgba(108,99,255,.15); transition:all .3s;" onmouseover="this.style.borderColor='var(--primary)'; this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--primary)'; this.style.color='var(--primary)'">
+                👥 بوابة الطالب
+            </a>
+        </div>
+        
+        <div class="section-title animate-in delay-1">📚 اختر صفك للبدء</div>
+        <div class="grade-grid animate-in delay-1">
+            <div class="grade-card" onclick="window.location.href='grade1.html'"><div class="icon">🎒</div><h3>الصف الأول</h3><p>أنشطة القراءة والقواعد</p></div>
+            <div class="grade-card" onclick="window.location.href='grade2.html'"><div class="icon">📚</div><h3>الصف الثاني</h3><p>أنشطة القراءة والقواعد</p></div>
+            <div class="grade-card" onclick="window.location.href='grade3.html'"><div class="icon">✏️</div><h3>الصف الثالث</h3><p>أنشطة القراءة والقواعد</p></div>
+            <div class="grade-card" onclick="window.location.href='grade4.html'"><div class="icon">📖</div><h3>الصف الرابع</h3><p>أنشطة القراءة والقواعد</p></div>
+            <div class="grade-card" onclick="window.location.href='grade5.html'"><div class="icon">🧮</div><h3>الصف الخامس</h3><p>أنشطة القراءة والقواعد</p></div>
+            <div class="grade-card" onclick="window.location.href='grade6.html'"><div class="icon">📝</div><h3>الصف السادس</h3><p>أنشطة القراءة والقواعد</p></div>
+            <div class="grade-card" onclick="window.location.href='grade7.html'"><div class="icon">🔬</div><h3>الصف السابع</h3><p>أنشطة القراءة والقواعد</p></div>
+            <div class="grade-card" onclick="window.location.href='grade8.html'"><div class="icon">🌍</div><h3>الصف الثامن</h3><p>أنشطة القراءة والقواعد</p></div>
+            <div class="grade-card" onclick="window.location.href='grade9.html'"><div class="icon">💡</div><h3>الصف التاسع</h3><p>أنشطة القراءة والقواعد</p></div>
+            <div class="grade-card" onclick="window.location.href='grade10.html'"><div class="icon">🎯</div><h3>الصف العاشر</h3><p>أنشطة القراءة والقواعد</p></div>
+            <div class="grade-card" onclick="window.location.href='grade11.html'"><div class="icon">🏆</div><h3>الصف الحادي عشر</h3><p>أنشطة القراءة والقواعد</p></div>
+            <div class="grade-card" onclick="window.location.href='grade12.html'"><div class="icon">🌟</div><h3>الصف الثاني عشر</h3><p>أنشطة القراءة والقواعد</p></div>
+        </div>
+        
+        <div style="text-align:center; margin-top:15px; color:var(--light); font-size:.9em;" class="animate-in delay-2">
+            للمعلمين: سجّل الدخول من <a href="admin.html" style="color:var(--primary); font-weight:700;">لوحة المشرف</a>
         </div>
     </div>
+
+    <script>
+    function goToGrade(grade) {
+        window.location.href = 'grade' + grade + '.html';
+    }
+    </script>
 </body>
 </html>
