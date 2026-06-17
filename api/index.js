@@ -34,8 +34,12 @@ function readStaticFile(filename) {
     path.join(__dirname, filename),
     '/vercel/path0/public/' + filename,
     '/vercel/path0/' + filename,
+    '/vercel/project/public/' + filename,
+    '/vercel/project/' + filename,
     '/var/task/public/' + filename,
     '/var/task/' + filename,
+    '/var/task/out/' + filename,
+    '/var/task/out/public/' + filename,
   ];
   for (const fp of candidates) {
     try {
