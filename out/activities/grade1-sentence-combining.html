@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الصف 1 - دمج الجمل</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#6C63FF;--primary-dark:#5A52D5;--accent:#00C9A7;--wrong:#FF6584;--bg:#F0F2FF;--card:#FFF;--text:#2D3436;--light:#636E72;--radius:20px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;text-align:center;padding:25px 20px;}
+.back{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;background:rgba(255,255,255,.2);padding:8px 16px;border-radius:12px;margin-bottom:10px;font-weight:600;font-size:.95em;}
+.container{max-width:800px;margin:0 auto;padding:25px 20px;}
+.section-title{text-align:center;margin-bottom:28px;}
+.section-title h1{font-size:1.6em;font-weight:800;color:var(--primary);margin-bottom:6px;}
+.section-title p{color:var(--light);font-size:1em;}
+.conjunction-prompt{background:linear-gradient(135deg,#EDE9FF,#F0EFFF);border-radius:var(--radius);padding:18px 24px;margin-bottom:24px;text-align:center;border:2px solid #D8D0FF;}
+.conjunction-prompt .word{font-size:1.5em;font-weight:800;color:var(--primary);display:inline-block;background:#fff;padding:6px 20px;border-radius:14px;box-shadow:0 2px 10px rgba(108,99,255,.15);}
+.sentence-pair{background:var(--card);border-radius:var(--radius);padding:22px;margin-bottom:20px;box-shadow:0 4px 20px rgba(108,99,255,.08);}
+.sentence-row{padding:12px 0;border-bottom:1px dashed #E8E8FF;font-size:1.05em;direction:ltr;text-align:left;}
+.sentence-row:last-child{border-bottom:none;}
+.sentence-row .num{color:var(--primary);font-weight:700;margin-left:8px;}
+.hint{font-size:.85em;color:var(--light);margin-top:8px;direction:rtl;text-align:right;}
+.input-area{margin-top:14px;}
+.input-area input{width:100%;padding:14px 18px;border:2px solid #E8E8FF;border-radius:14px;font-size:1.05em;font-family:'Tajawal',sans-serif;direction:ltr;text-align:left;transition:all .3s;outline:none;background:#FAFAFF;}
+.input-area input:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(108,99,255,.1);}
+.input-area input.correct-input{border-color:var(--accent);background:#E0FFF8;box-shadow:0 0 0 3px rgba(0,201,167,.15);}
+.input-area input.wrong-input{border-color:var(--wrong);background:#FFF0F3;box-shadow:0 0 0 3px rgba(255,101,132,.1);}
+.feedback{margin-top:10px;padding:10px 16px;border-radius:12px;font-size:.95em;font-weight:600;display:none;}
+.feedback.show{display:block;}
+.feedback.correct-fb{background:#E0FFF8;color:#00875A;}
+.feedback.wrong-fb{background:#FFF0F3;color:#C0392B;}
+.correct-answer{color:var(--accent);font-weight:700;}
+.controls{display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap;}
+.btn{padding:14px 36px;border:none;border-radius:14px;font-family:'Tajawal',sans-serif;font-size:1.1em;font-weight:700;cursor:pointer;transition:all .3s;}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;box-shadow:0 4px 15px rgba(108,99,255,.4);}
+.btn-primary:hover{transform:translateY(-2px);}
+.btn-secondary{background:#EDE9FF;color:var(--primary);}
+.btn-success{background:linear-gradient(135deg,var(--accent),#00A88A);color:#fff;}
+.result-box{background:var(--card);border-radius:var(--radius);padding:30px;text-align:center;box-shadow:0 8px 30px rgba(108,99,255,.15);display:none;margin-top:20px;}
+.result-box .score{font-size:3em;font-weight:900;color:var(--primary);margin:15px 0;}
+.result-box .details{color:var(--light);font-size:1.05em;margin-bottom:20px;}
+.progress-bar{background:#E8E8FF;border-radius:10px;height:8px;margin-bottom:24px;overflow:hidden;}
+.progress-bar .fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:10px;transition:width .5s ease;}
+@media(max-width:600px){.section-title h1{font-size:1.3em;}.sentence-pair{padding:16px;}.btn{padding:12px 24px;font-size:1em;}}
+</style>
+</head>
+<body>
+<div class="header">
+<a href="../grade1.html" class="back">→ رجوع</a>
+<h1>🔗 دمج الجمل (Sentence Combining)</h1>
+</div>
+<div class="container">
+<div class="section-title">
+<h1>ادمج الجملتين في جملة واحدة صحيحة</h1>
+<p>استخدم الكلمة المطلوبة (conjunction) لربط الجملتين</p>
+</div>
+<div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
+<div id="exercises"></div>
+<div class="controls" id="controls">
+<button class="btn btn-primary" onclick="checkAll()">تسليم ✓</button>
+<button class="btn btn-success" onclick="showHints()">تلميح 💡</button>
+</div>
+<div class="result-box" id="result">
+<h2 id="resultTitle"></h2>
+<div class="score" id="scoreDisplay"></div>
+<div class="details" id="resultDetails"></div>
+<div class="controls">
+<button class="btn btn-secondary" onclick="restartActivity()">إعادة المحاولة ↻</button>
+<a href="../grade1.html" class="btn btn-primary">العودة للألعاب</a>
+</div>
+</div>
+</div>
+<script>
+const exercisesData=[
+{conjunction:'and',sentence1:'I have a cat.',sentence2:'I have a dog.',correctAnswer:'I have a cat and I have a dog.',correctAnswers:null},
+{conjunction:'and',sentence1:'She likes apples.',sentence2:'She likes bananas.',correctAnswer:'She likes apples and she likes bananas.',correctAnswers:null},
+{conjunction:'and',sentence1:'The sun is bright.',sentence2:'The sky is blue.',correctAnswer:'The sun is bright and the sky is blue.',correctAnswers:null},
+{conjunction:'but',sentence1:'I like to run.',sentence2:'I do not like to swim.',correctAnswer:'I like to run but I do not like to swim.',correctAnswers:null},
+{conjunction:'and',sentence1:'My mom is kind.',sentence2:'My dad is kind.',correctAnswer:'My mom is kind and my dad is kind.',correctAnswers:null},
+{conjunction:'and',sentence1:'I go to school.',sentence2:'I learn English.',correctAnswer:'I go to school and I learn English.',correctAnswers:null}
+];
+let checked=new Set();
+document.getElementById('exercises').innerHTML=exercisesData.map((ex,i)=>{
+return`<div class="sentence-pair">
+<div class="conjunction-prompt">استخدم: <span class="word">${ex.conjunction}</span></div>
+<div class="sentence-row"><span class="num">1.</span> ${ex.sentence1}</div>
+<div class="sentence-row"><span class="num">2.</span> ${ex.sentence2}</div>
+<div class="hint">💡 فكر: كيف ترتبط هاتان الجملتان؟</div>
+<div class="input-area">
+<input type="text" id="answer${i}" placeholder="اكتب الجملة المدمجة هنا..." autocomplete="off">
+</div>
+<div class="feedback" id="fb${i}"></div>
+</div>`;
+}).join('');
+
+document.querySelectorAll('.input-area input').forEach(inp=>{
+inp.addEventListener('input',()=>{
+let filled2=0;
+document.querySelectorAll('.input-area input').forEach(x=>{if(x.value.trim().length>0)filled2++});
+document.getElementById('progressFill').style.width=Math.round((filled2/exercisesData.length)*100)+'%';
+});
+});
+
+function normalize(str){return str.trim().toLowerCase().replace(/[.,!?;:'"]/g,'').replace(/\s+/g,' ');}
+
+function checkAll(){
+let correct=0;
+const total=exercisesData.length;
+exercisesData.forEach((ex,i)=>{
+const input=document.getElementById('answer'+i);
+const fb=document.getElementById('fb'+i);
+if(!input)return;
+const userAnswer=normalize(input.value);
+const correctNormalized=normalize(ex.correctAnswer);
+// Flexible matching: check if key words match
+const userWords=userAnswer.split(' ');
+const correctWords=correctNormalized.split(' ');
+// Accept if user included both sentences + the conjunction
+const hasConjunction=userWords.includes(ex.conjunction);
+const matches=normalize(input.value)===correctNormalized;
+const flexibleMatch=userAnswer.includes(normalize(ex.sentence1))&&userAnswer.includes(normalize(ex.sentence2))&&hasConjunction;
+
+input.disabled=true;
+input.classList.remove('correct-input','wrong-input');
+
+if(matches||flexibleMatch){
+correct++;
+input.classList.add('correct-input');
+fb.className='feedback show correct-fb';
+fb.innerHTML='✅ ممتاز! إجابة صحيحة';
+}else{
+input.classList.add('wrong-input');
+fb.className='feedback show wrong-fb';
+fb.innerHTML='❌ الإجابة الصحيحة: <span class="correct-answer">'+ex.correctAnswer+'</span>';
+}
+});
+
+const pct=Math.round((correct/total)*100);
+document.getElementById('controls').style.display='none';
+document.getElementById('result').style.display='block';
+document.getElementById('resultTitle').textContent=correct===total?'🎉 ممتاز! جميع الإجابات صحيحة!':correct>=total/2?'👏 عمل جيد!':'💪 حاول مرة أخرى!';
+document.getElementById('scoreDisplay').textContent=correct+' / '+total;
+document.getElementById('resultDetails').textContent='النسبة: '+pct+'%';
+document.getElementById('progressFill').style.width='100%';
+saveExercise(correct,total,pct);
+
+if(correct===total)showCelebration();
+}
+
+function showHints(){
+exercisesData.forEach((ex,i)=>{
+const fb=document.getElementById('fb'+i);
+if(!checked.has(i)){
+fb.className='feedback show correct-fb';
+fb.innerHTML='💡 تلميح: ابدأ بـ <b>'+ex.sentence1+' </b> ثم أضف <b>'+(ex.conjunction)+'</b> ثم <b>'+ex.sentence2+'</b>';
+checked.add(i);
+}
+});
+}
+
+function saveExercise(s,t,p){
+const r={
+studentName:localStorage.getItem('studentName')||'Student',
+grade:1,
+gradeName:'الصف الأول',
+activityName:'Sentence Combining',
+score:s,
+total_questions:t,
+percentage:p,
+date:new Date().toISOString().split('T')[0],
+submittedAt:new Date().toISOString()
+};
+fetch('/api/save-result',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify(r)
+}).catch(()=>{
+let a=JSON.parse(localStorage.getItem('studentResults')||'[]');
+a.push(r);localStorage.setItem('studentResults',JSON.stringify(a));
+});
+}
+
+function restartActivity(){
+location.reload();
+}
+
+function showCelebration(){
+const colors=['#6C63FF','#FF6584','#00C9A7','#FFD93D','#FF8C42'];
+for(let i=0;i<30;i++){
+const conf=document.createElement('div');
+conf.style.cssText='position:fixed;width:10px;height:10px;background:'+colors[i%colors.length]+';border-radius:50%;top:-20px;left:'+Math.random()*100+'vw;animation:confettiFall '+(Math.random()*2+2)+'s linear forwards;';
+document.body.appendChild(conf);
+setTimeout(()=>conf.remove(),4000);
+}
+const style=document.createElement('style');
+style.textContent='@keyframes confettiFall{0%{top:-20px;transform:rotate(0deg);}100%{top:110vh;transform:rotate(720deg);}}';
+document.head.appendChild(style);
+}
+</script>
+</body>
+</html>

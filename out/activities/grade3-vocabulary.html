@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الصف الثالث - المفردات</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#6C63FF;--accent:#00C9A7;--wrong:#FF6584;--bg:#F0F2FF;--card:#FFF;--text:#2D3436;--light:#636E72;--radius:20px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.header{background:linear-gradient(135deg,var(--primary),#5A52D5);color:#fff;text-align:center;padding:25px 20px;}
+.back{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;background:rgba(255,255,255,.2);padding:8px 16px;border-radius:12px;margin-bottom:10px;font-weight:600;}
+.container{max-width:700px;margin:0 auto;padding:25px 20px;}
+.question-block{background:var(--card);border-radius:var(--radius);padding:22px;margin-bottom:18px;box-shadow:0 4px 20px rgba(108,99,255,.08);}
+.question-block h4{margin-bottom:6px;}
+.question-block .en-word{direction:ltr;text-align:left;font-size:1.3em;font-weight:700;color:var(--primary);margin:10px 0;}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.option{padding:14px;border:2px solid #E8E8FF;border-radius:14px;cursor:pointer;transition:all .2s;text-align:center;font-size:1em;}
+.option:hover{border-color:var(--primary);background:#F8F7FF;}
+.option.selected{border-color:var(--primary);background:#EDE9FF;}
+.option.correct{border-color:var(--accent)!important;background:#E0FFF8!important;color:#00875A;}
+.option.wrong{border-color:var(--wrong)!important;background:#FFF0F3!important;color:#C0392B;}
+.controls{display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap;}
+.btn{padding:14px 36px;border:none;border-radius:14px;font-family:'Tajawal',sans-serif;font-size:1.1em;font-weight:700;cursor:pointer;transition:all .3s;}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#5A52D5);color:#fff;box-shadow:0 4px 15px rgba(108,99,255,.4);}
+.btn-secondary{background:#EDE9FF;color:var(--primary);}
+.result-box{background:var(--card);border-radius:var(--radius);padding:30px;text-align:center;box-shadow:0 8px 30px rgba(108,99,255,.15);display:none;margin-top:20px;}
+.result-box .score{font-size:3em;font-weight:900;color:var(--primary);margin:15px 0;}
+.timer{background:rgba(255,255,255,.15);padding:8px 16px;border-radius:10px;display:inline-block;font-weight:700;margin-bottom:15px;}
+</style>
+</head>
+<body>
+<div class="header">
+<a href="../grade3.html" class="back">→ رجوع</a>
+<h1>📝 المفردات - الصف الثالث</h1>
+<div class="timer" id="timer">⏱ 00:00</div>
+</div>
+<div class="container">
+<div id="quiz"></div>
+<div class="controls" id="controls"><button class="btn btn-primary" onclick="submitAnswers()">تسليم ✓</button></div>
+<div class="result-box" id="result">
+<h2 id="resultTitle"></h2><div class="score" id="scoreDisplay"></div><div id="resultDetails"></div>
+<div class="controls"><button class="btn btn-secondary" onclick="location.reload()">إعادة ↻</button><a href="../grade3.html" class="btn btn-primary">العودة</a></div>
+</div>
+</div>
+<script>
+const quiz={questions:[
+{word:'Dog',translation:'🐕'},
+{word:'Cat',translation:'🐱'},
+{word:'Apple',translation:'🍎'},
+{word:'Book',translation:'📕'},
+{word:'Sun',translation:'☀️'},
+{word:'Flower',translation:'🌺'}
+],translationOptions:{Dog:['كلب','قطة','عصفور','سمكة'],Cat:['قطة','كلب','أرنب','حصان'],Apple:['تفاحة','موزة','برتقالة','عنبه'],Book:['كتاب','قلم','مكتب','حقيبة'],Sun:['شمس','قمر','نجمة','سحابة'],Flower:['زهرة','شجرة','عشب','وردة']}};
+let answers={};let startTime=Date.now();
+setInterval(()=>{const s=Math.floor((Date.now()-startTime)/1000);document.getElementById('timer').textContent=`⏱ ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;},1000);
+const qd=document.getElementById('quiz');
+Object.keys(quiz.translationOptions).forEach((word,i)=>{
+const correctTranslation=quiz.questions[i].translation;
+const options=quiz.translationOptions[word];
+const d=document.createElement('div');d.className='question-block';
+d.innerHTML=`<h4>${i+1}. ما معنى هذه الكلمة؟</h4><div class="en-word">${word} ${correctTranslation}</div><div class="options">${options.map((o,j)=>`<div class="option" data-q="${i}" data-a="${j}" onclick="sel(this,${i},${j})">${o}</div>`).join('')}</div>`;
+qd.appendChild(d);
+});
+// Correct answers: first option is always correct for simplicity
+function sel(el,q,a){document.querySelectorAll(`.option[data-q="${q}"]`).forEach(o=>o.classList.remove('selected'));el.classList.add('selected');answers[q]=a;}
+function submitAnswers(){let c=0;quiz.questions.forEach((q,i)=>{const correctOptions=quiz.translationOptions[q.word];const correctIdx=0;answers[i]===0&&c++;document.querySelectorAll(`.option[data-q="${i}"]`).forEach(o=>{if(parseInt(o.dataset.a)===correctIdx)o.classList.add('correct');if(answers[i]===parseInt(o.dataset.a)&&answers[i]!==correctIdx)o.classList.add('wrong');o.style.pointerEvents='none';});});
+const time=Math.floor((Date.now()-startTime)/1000);const t=quiz.questions.length,pct=Math.round((c/t)*100);
+document.getElementById('controls').style.display='none';document.getElementById('result').style.display='block';
+document.getElementById('resultTitle').textContent=c===t?'🎉 ممتاز!':'👍 أحسنت!';
+document.getElementById('scoreDisplay').textContent=`${c} / ${t}`;
+document.getElementById('resultDetails').textContent=`النتيجة: ${pct}% | الوقت: ${Math.floor(time/60)} دقيقة و ${time%60} ثانية`;
+save(c,t,pct,time);
+}
+function save(s,t,p,tm){const r={studentName:localStorage.getItem('studentName')||'طالب',grade:3,gradeName:'الصف الثالث',activityName:'المفردات',score:s,total_questions:t,percentage:p,time_taken_seconds:tm,date:new Date().toISOString().split('T')[0],submittedAt:new Date().toISOString()};fetch('/api/save-result',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(r)}).catch(()=>{let a=JSON.parse(localStorage.getItem('studentResults')||'[]');a.push(r);localStorage.setItem('studentResults',JSON.stringify(a));});}</script>
+</body>
+</html>

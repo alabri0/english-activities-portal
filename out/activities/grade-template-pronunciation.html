@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التدريب على النطق - <GRADE></title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#E74C3C;--primary-dark:#C0392B;--accent:#00C9A7;--accent-glow:rgba(0,201,167,.2);--bg:#FFF5F5;--card:#FFF;--text:#2D3436;--light:#636E72;--radius:20px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;text-align:center;padding:25px 20px;}
+.back{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;background:rgba(255,255,255,.2);padding:8px 16px;border-radius:12px;margin-bottom:10px;font-weight:600;}
+.container{max-width:750px;margin:0 auto;padding:25px 20px;}
+
+/* Progress */
+.progress-bar{background:var(--card);border-radius:var(--radius);padding:15px 22px;margin-bottom:20px;box-shadow:0 4px 20px rgba(231,76,60,.08);display:flex;align-items:center;gap:15px;}
+.progress-track{flex:1;height:10px;background:#FFE8E8;border-radius:10px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:10px;transition:width .5s ease;}
+.progress-text{font-weight:700;color:var(--primary);white-space:nowrap;font-size:.95em;}
+
+/* Word Card */
+.word-card{background:var(--card);border-radius:var(--radius);padding:30px 25px;text-align:center;box-shadow:0 8px 30px rgba(231,76,60,.1);margin-bottom:20px;display:none;}
+.word-card.active{display:block;animation:fadeInUp .5s ease;}
+.word-english{font-size:2.2em;font-weight:900;direction:ltr;color:var(--text);margin-bottom:8px;}
+.word-arabic{font-size:1em;color:var(--light);margin-bottom:15px;}
+.word-phonetic{direction:ltr;color:var(--primary);font-size:1.1em;font-weight:600;margin-bottom:20px;padding:8px 16px;background:#FFF0F0;border-radius:12px;display:inline-block;}
+
+/* Controls */
+.speak-btn{width:80px;height:80px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;font-size:2em;cursor:pointer;box-shadow:0 6px 25px rgba(231,76,60,.4);transition:all .3s;margin-bottom:15px;}
+.speak-btn:hover{transform:scale(1.1);}
+.speak-btn:active{transform:scale(.95);}
+.speak-btn.speaking{animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 6px 25px rgba(231,76,60,.4);}50%{box-shadow:0 6px 40px rgba(231,76,60,.7);}}
+
+/* Dictation */
+.dictation-box{background:var(--card);border-radius:var(--radius);padding:25px;text-align:center;box-shadow:0 4px 20px rgba(231,76,60,.08);margin-bottom:20px;display:none;}
+.dictation-box.active{display:block;animation:fadeInUp .5s ease;}
+.dictation-instruction{color:var(--light);margin-bottom:15px;font-size:1em;}
+.dictation-input{width:100%;max-width:350px;padding:14px 20px;border:2px solid #FFE0E3;border-radius:14px;font-size:1.3em;font-family:'Tajawal',sans-serif;direction:ltr;text-align:center;outline:none;transition:all .3s;background:#FFF8F8;}
+.dictation-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(231,76,60,.1);}
+.dictation-input.correct{border-color:var(--accent);background:#E0FFF8;box-shadow:0 0 0 3px var(--accent-glow);}
+.dictation-input.wrong{border-color:var(--primary);background:#FFE8E8;}
+.dictation-result{margin-top:15px;font-size:1em;font-weight:700;min-height:30px;}
+
+/* Syllable breakdown */
+.syllable-row{display:flex;justify-content:center;gap:8px;margin-top:15px;flex-wrap:wrap;}
+.syllable{background:#FFF0F0;color:var(--primary);padding:6px 14px;border-radius:10px;font-size:1.1em;font-weight:700;direction:ltr;}
+.syllable.stress{background:var(--primary);color:#fff;}
+
+/* Next button */
+.next-btn{padding:14px 40px;border:none;border-radius:14px;font-family:'Tajawal',sans-serif;font-size:1.1em;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;box-shadow:0 4px 15px rgba(231,76,60,.4);transition:all .3s;display:none;}
+.next-btn:hover{transform:translateY(-2px);}
+.next-btn.visible{display:inline-block;animation:fadeInUp .3s ease;}
+
+/* Results */
+.result-box{background:var(--card);border-radius:var(--radius);padding:35px;text-align:center;box-shadow:0 8px 30px rgba(231,76,60,.15);display:none;margin-top:20px;}
+.result-box.visible{display:block;animation:fadeInUp .5s ease;}
+.result-box .score{font-size:3.5em;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:15px 0;}
+.result-box .grade-label{font-size:1.2em;color:var(--light);margin-bottom:20px;}
+.result-words{margin:20px 0;text-align:right;}
+.result-word{display:flex;align-items:center;gap:10px;padding:10px 15px;border-radius:12px;margin-bottom:8px;background:#FAFAFA;}
+.result-word .check{font-size:1.2em;}
+.result-word .word-info{flex:1;}
+.result-word .word-info .en{font-weight:700;direction:ltr;text-align:left;}
+.result-word .word-info .ar{color:var(--light);font-size:.9em;}
+.controls{display:flex;gap:12px;justify-content:center;margin-top:25px;flex-wrap:wrap;}
+.btn{padding:14px 36px;border:none;border-radius:14px;font-family:'Tajawal',sans-serif;font-size:1.1em;font-weight:700;cursor:pointer;transition:all .3s;}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;box-shadow:0 4px 15px rgba(231,76,60,.4);}
+.btn-secondary{background:#FFE8E8;color:var(--primary);}
+
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+@keyframes bounce{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+.correct-anim{animation:bounce .5s ease;}
+.wrong-anim{animation:shake .5s ease;}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-8px);}75%{transform:translateX(8px);}}
+</style>
+</head>
+<body>
+<div class="header"><a href="../grade<GRADE>.html" class="back">→ رجوع</a><h1>🎤 التدريب على النطق</h1></div>
+<div class="container">
+<div id="startScreen">
+<div class="word-card active">
+<div style="font-size:4em;margin-bottom:15px;">🎤</div>
+<h2 style="color:var(--primary);margin-bottom:10px;">مرحباً بك في التدريب على النطق!</h2>
+<p style="color:var(--light);margin-bottom:25px;">استمع للكلمات وحاول كتابتها بشكل صحيح. سنجعل نطقك أفضل خطوة بخطوة.</p>
+<div style="text-align:center;margin-bottom:20px;">
+<div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;">
+<div style="text-align:center;"><div style="font-size:2em;">🔊</div><p style="color:var(--light);font-size:.9em;">استمع</p></div>
+<div style="text-align:center;"><div style="font-size:2em;">✍️</div><p style="color:var(--light);font-size:.9em;">اكتب ما سمعت</p></div>
+<div style="text-align:center;"><div style="font-size:2em;">⭐</div><p style="color:var(--light);font-size:.9em;">احصل على نقاط</p></div>
+</div>
+</div>
+<button class="btn btn-primary" onclick="startPronunciation()">ابدأ التدريب ▶</button>
+</div>
+</div>
+
+<div id="quizArea" style="display:none;">
+<div class="progress-bar">
+<span class="progress-text" id="progressText">1 / 10</span>
+<div class="progress-track"><div class="progress-fill" id="progressFill" style="width:10%;"></div></div>
+</div>
+
+<div class="word-card" id="wordCard">
+<div class="word-english" id="wordEnglish"></div>
+<div class="word-arabic" id="wordArabic"></div>
+<div class="word-phonetic" id="wordPhonetic"></div>
+<div class="syllable-row" id="syllableRow"></div>
+<button class="speak-btn" id="speakBtn" onclick="speakWord()">🔊</button>
+<p style="color:var(--light);font-size:.9em;margin-top:5px;">اضغط للاستماع</p>
+</div>
+
+<div class="dictation-box" id="dictationBox">
+<div class="dictation-instruction">✍️ ماذا سمعت؟ اكتب الكلمة بالإنجليزية:</div>
+<input type="text" class="dictation-input" id="dictationInput" placeholder="اكتب هنا..." autocomplete="off" onkeydown="if(event.key==='Enter')checkAnswer()">
+<div class="dictation-result" id="dictationResult"></div>
+<button class="next-btn" id="nextBtn" onclick="nextWord()">الكلمة التالية ←</button>
+</div>
+</div>
+
+<div class="result-box" id="resultBox">
+<div style="font-size:3em;margin-bottom:10px;">🏆</div>
+<h2 style="color:var(--primary);">أحسنت! لقد أنهيت التدريب</h2>
+<div class="score" id="finalScore">0/10</div>
+<div class="grade-label" id="gradeLabel"></div>
+<div class="result-words" id="resultWords"></div>
+<div class="controls">
+<button class="btn btn-secondary" onclick="location.reload()">إعادة ↻</button>
+<a href="../grade<GRADE>.html" class="btn btn-primary">العودة للقائمة</a>
+</div>
+</div>
+</div>
+
+<script>
+const GRADE=<GRADE>;
+const words=<WORDS>;
+
+let currentIndex=0;let score=0;let results=[];let isAnswered=false;
+
+function startPronunciation(){
+document.getElementById('startScreen').style.display='none';
+document.getElementById('quizArea').style.display='block';
+showWord(0);
+}
+
+function showWord(i){
+currentIndex=i;isAnswered=false;
+const w=words[i];
+document.getElementById('wordEnglish').textContent=w.en;
+document.getElementById('wordArabic').textContent=w.ar;
+document.getElementById('wordPhonetic').textContent=w.phonetic||'';
+document.getElementById('progressText').textContent=(i+1)+' / '+words.length;
+document.getElementById('progressFill').style.width=((i+1)/words.length*100)+'%';
+
+const sr=document.getElementById('syllableRow');
+sr.innerHTML='';
+if(w.syllables){
+w.syllables.forEach((s,si)=>{
+const span=document.createElement('span');
+span.className='syllable'+(s.stress?' stress':'');
+span.textContent=s.text;
+sr.appendChild(span);
+});
+}
+
+document.getElementById('wordCard').classList.add('active');
+document.getElementById('dictationBox').classList.remove('active');
+document.getElementById('dictationInput').value='';
+document.getElementById('dictationInput').className='dictation-input';
+document.getElementById('dictationResult').innerHTML='';
+document.getElementById('nextBtn').classList.remove('visible');
+
+setTimeout(()=>speakWord(),600);
+}
+
+function speakWord(){
+window.speechSynthesis.cancel();
+const u=new SpeechSynthesisUtterance(words[currentIndex].en);
+u.lang='en-US';u.rate=0.85;u.pitch=1;
+const btn=document.getElementById('speakBtn');
+btn.classList.add('speaking');
+u.onend=()=>btn.classList.remove('speaking');
+u.onerror=()=>btn.classList.remove('speaking');
+window.speechSynthesis.speak(u);
+setTimeout(()=>document.getElementById('dictationBox').classList.add('active'),1500);
+}
+
+function checkAnswer(){
+if(isAnswered)return;isAnswered=true;
+const input=document.getElementById('dictationInput');
+const answer=input.value.trim().toLowerCase();
+const correct=words[currentIndex].en.toLowerCase();
+const result=document.getElementById('dictationResult');
+const w=words[currentIndex];
+
+results.push({word:w,en:w.ar,score:answer===correct});
+
+if(answer===correct){
+score++;
+input.classList.add('correct');
+input.classList.add('correct-anim');
+result.innerHTML='<span style="color:var(--accent);">✅ ممتاز! إجابة صحيحة</span>';
+}else{
+input.classList.add('wrong');
+input.classList.add('wrong-anim');
+result.innerHTML='<span style="color:var(--primary);">❌ الإجابة الصحيحة: '+w.en+'</span>';
+}
+document.getElementById('nextBtn').classList.add('visible');
+}
+
+function nextWord(){
+if(currentIndex<words.length-1){
+showWord(currentIndex+1);
+}else{
+showResults();
+}
+}
+
+function showResults(){
+document.getElementById('quizArea').style.display='none';
+const rb=document.getElementById('resultBox');
+rb.classList.add('visible');
+document.getElementById('finalScore').textContent=score+'/'+words.length;
+const pct=score/words.length;
+let label='';
+if(pct===1)label='🌟 أداء مثالي! أنت نجم!';
+else if(pct>=0.8)label='👏 عمل رائع! استمر!';
+else if(pct>=0.6)label='👍 جيد! يمكنك التحسن!';
+else label='💪 لا تستسلم! حاول مرة أخرى!';
+document.getElementById('gradeLabel').textContent=label;
+
+const rw=document.getElementById('resultWords');
+rw.innerHTML='';
+results.forEach((r,i)=>{
+const div=document.createElement('div');
+div.className='result-word';
+div.innerHTML='<span class="check">'+(r.score?'✅':'❌')+'</span><div class="word-info"><div class="en">'+r.word.en+'</div><div class="ar">'+r.word.ar+'</div></div>';
+rw.appendChild(div);
+});
+}
+</script>
+</body>
+</html>

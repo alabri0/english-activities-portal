@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الصف السابع - فرز الكلمات</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#6C63FF;--primary-dark:#5A52D5;--accent:#00C9A7;--wrong:#FF6584;--bg:#F0F2FF;--card:#FFF;--text:#2D3436;--light:#636E72;--radius:20px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;text-align:center;padding:25px 20px;}
+.back{display:inline-flex;align-items:center;gap:6px;color:#fff;text-decoration:none;background:rgba(255,255,255,.2);padding:8px 16px;border-radius:12px;margin-bottom:10px;font-weight:600;font-size:.95em;}
+.container{max-width:800px;margin:0 auto;padding:25px 20px;}
+.instruction{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:24px;box-shadow:0 8px 30px rgba(108,99,255,.12);text-align:center;}
+.instruction h3{color:var(--primary);margin-bottom:8px;font-size:1.15em;}
+.instruction p{color:var(--light);font-size:.95em;}
+.word-bank{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:24px;box-shadow:0 4px 20px rgba(108,99,255,.08);min-height:80px;}
+.word-bank h4{color:var(--light);margin-bottom:14px;font-size:.95em;text-align:center;}
+.words-container{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;min-height:50px;}
+.drag-word{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;padding:12px 22px;border-radius:14px;cursor:grab;user-select:none;font-size:1.05em;font-weight:700;direction:ltr;transition:all .2s;box-shadow:0 3px 10px rgba(108,99,255,.3);letter-spacing:.5px;}
+.drag-word:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 6px 20px rgba(108,99,255,.4);}
+.drag-word:active{cursor:grabbing;transform:scale(.95);}
+.drag-word.placed{opacity:.35;pointer-events:none;}
+.drop-zones{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-bottom:24px;}
+.drop-zone{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:0 4px 20px rgba(108,99,255,.08);min-height:140px;transition:all .3s;border:2px dashed transparent;}
+.drop-zone.drag-over{border-color:var(--primary)!important;background:#EDE9FF!important;transform:scale(1.02);}
+.drop-zone h4{text-align:center;color:var(--primary);margin-bottom:14px;font-size:1.05em;padding-bottom:10px;border-bottom:2px dashed #E8E8FF;}
+.drop-zone .zone-words{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:40px;padding:4px;}
+.drop-zone .zone-word{background:linear-gradient(135deg,var(--accent),#00896A);color:#fff;padding:8px 16px;border-radius:10px;font-size:1em;font-weight:600;direction:ltr;transition:all .2s;box-shadow:0 2px 8px rgba(0,201,167,.3);}
+.drop-zone .zone-word.wrong{background:linear-gradient(135deg,var(--wrong),#C0392B)!important;box-shadow:0 2px 8px rgba(255,101,132,.3)!important;}
+.drop-zone .zone-word.correct{background:linear-gradient(135deg,var(--accent),#00896A)!important;box-shadow:0 2px 8px rgba(0,201,167,.3)!important;}
+.controls{display:flex;gap:12px;justify-content:center;margin-top:30px;flex-wrap:wrap;}
+.btn{padding:14px 36px;border:none;border-radius:14px;font-family:'Tajawal',sans-serif;font-size:1.1em;font-weight:700;cursor:pointer;transition:all .3s;}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;box-shadow:0 4px 15px rgba(108,99,255,.4);}
+.btn-primary:hover{transform:translateY(-2px);}
+.btn-secondary{background:#EDE9FF;color:var(--primary);}
+.result-box{background:var(--card);border-radius:var(--radius);padding:30px;text-align:center;box-shadow:0 8px 30px rgba(108,99,255,.15);display:none;margin-top:20px;}
+.result-box .score{font-size:3em;font-weight:900;color:var(--primary);margin:15px 0;}
+.result-box .details{color:var(--light);font-size:1.05em;margin-bottom:20px;}
+.confetti{position:fixed;top:-10px;pointer-events:none;font-size:1.5em;z-index:999;animation:fall 3s ease-in forwards;}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0;}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.animate{animation:fadeInUp .5s ease forwards;}
+@media(max-width:600px){.drop-zones{grid-template-columns:1fr;}.drag-word{padding:10px 16px;font-size:.95em;}}
+</style>
+</head>
+<body>
+<div class="header">
+<a href="../grade7.html" class="back">→ رجوع</a>
+<h1>🔤 فرز الكلمات - الصف السابع</h1>
+</div>
+<div class="container">
+<div class="instruction">
+<h3>🎯 هل يمكنك تمييز الأسماء من الأفعال؟</h3>
+<p>اسحب الكلمات وضعها في التصنيف الصحيح: أسماء أو أفعال</p>
+</div>
+<div class="word-bank">
+<h4>📦 بنك الكلمات</h4>
+      <div class="drag-word" draggable="true" id="w0" data-word="sunny" ondragstart="handleDragStart(event)">sunny</div>
+      <div class="drag-word" draggable="true" id="w1" data-word="swimming" ondragstart="handleDragStart(event)">swimming</div>
+      <div class="drag-word" draggable="true" id="w2" data-word="snowy" ondragstart="handleDragStart(event)">snowy</div>
+      <div class="drag-word" draggable="true" id="w3" data-word="cloudy" ondragstart="handleDragStart(event)">cloudy</div>
+      <div class="drag-word" draggable="true" id="w4" data-word="rainy" ondragstart="handleDragStart(event)">rainy</div>
+      <div class="drag-word" draggable="true" id="w5" data-word="running" ondragstart="handleDragStart(event)">running</div>
+      <div class="drag-word" draggable="true" id="w6" data-word="football" ondragstart="handleDragStart(event)">football</div>
+      <div class="drag-word" draggable="true" id="w7" data-word="tennis" ondragstart="handleDragStart(event)">tennis</div>
+      <div class="drag-word" draggable="true" id="w8" data-word="cycling" ondragstart="handleDragStart(event)">cycling</div>
+      <div class="drag-word" draggable="true" id="w9" data-word="windy" ondragstart="handleDragStart(event)">windy</div>
+</div>
+      <div class="drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, undefined)">
+        <h4>⚽ رياضة</h4>
+        <div class="zone-words"></div>
+      </div>      <div class="drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, undefined)">
+        <h4>🌤️ طقس</h4>
+        <div class="zone-words"></div>
+      </div>
+<div class="controls">
+<button class="btn btn-primary" onclick="submitAnswers()">تسليم ✓</button>
+<button class="btn btn-secondary" onclick="resetActivity()">إعادة ↺</button>
+</div>
+<div class="result-box" id="result">
+<h2 id="resultTitle"></h2>
+<div class="score" id="scoreDisplay"></div>
+<div class="details" id="resultDetails"></div>
+<div class="controls">
+<button class="btn btn-primary" onclick="resetActivity()">حاول مرة أخرى ↺</button>
+<button class="btn btn-secondary" onclick="goBack()">← رجوع</button>
+</div>
+</div>
+</div>
+<script>
+const GRADE_DATA = [
+{ category: "⚽ رياضة", words: ["football","tennis","swimming","running","cycling"], correctIndex: 0 },
+{ category: "🌤️ طقس", words: ["sunny","rainy","cloudy","windy","snowy"], correctIndex: 1 },
+];
+
+
+let placedWords = {};
+let totalWords = 0;
+let correctCount = 0;
+
+function init() {
+  const bank = document.getElementById('wordBank');
+  const zones = document.getElementById('dropZones');
+  let allWords = [];
+
+  GRADE_DATA.forEach(group => {
+    allWords.push(...group.words);
+    zones.innerHTML += `
+      <div class="drop-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, '${group.category}')">
+        <h4>${group.category}</h4>
+        <div class="zone-words"></div>
+      </div>`;
+  });
+
+  allWords.sort(() => Math.random() - 0.5);
+  totalWords = allWords.length;
+
+  bank.innerHTML = allWords.map((w, i) => 
+    `<div class="drag-word" draggable="true" id="w${i}" data-word="${w}" ondragstart="handleDragStart(event)">${w}</div>`
+  ).join('');
+}
+
+function handleDragStart(e) { e.dataTransfer.setData('text/plain', e.target.id); e.dataTransfer.effectAllowed = 'move'; }
+function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+
+function handleDrop(e, category) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  const wordId = e.dataTransfer.getData('text/plain');
+  const wordEl = document.getElementById(wordId);
+  if (!wordEl) return;
+  const wordText = wordEl.dataset.word;
+  const zone = e.currentTarget.querySelector('.zone-words');
+  const dropWord = document.createElement('div');
+  dropWord.className = 'zone-word';
+  dropWord.textContent = wordText;
+  dropWord.dataset.word = wordText;
+  dropWord.draggable = true;
+  dropWord.ondragstart = handleDragStart;
+  zone.appendChild(dropWord);
+  wordEl.classList.add('placed');
+  placedWords[wordText] = category;
+}
+
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('zone-word')) {
+    const word = e.target.dataset.word;
+    const bankWord = document.querySelector(`#wordBank .drag-word[data-word="${word}"]`);
+    if (bankWord) bankWord.classList.remove('placed');
+    delete placedWords[word];
+    e.target.remove();
+  }
+});
+
+function getCorrectCategory(word) {
+  for (const group of GRADE_DATA) {
+    if (group.answers[word]) return group.answers[word];
+  }
+  return null;
+}
+
+function submitAnswers() {
+  if (Object.keys(placedWords).length === 0) { alert('اسحب بعض الكلمات أولاً!'); return; }
+  correctCount = 0;
+  
+  GRADE_DATA.forEach(group => {
+    group.words.forEach(w => {
+      if (placedWords[w] === group.category) {
+        correctCount++;
+        const zoneEl = document.querySelector(`.drop-zone:has(h4:contains("${group.category}"))`);
+        if (zoneEl) {
+          const found = zoneEl.querySelector(`.zone-word[data-word="${w}"]`);
+          if (found) found.classList.add('correct');
+        }
+      } else if (placedWords[w]) {
+        const allZones = document.querySelectorAll('.drop-zone');
+        allZones.forEach(z => {
+          const found = z.querySelector(`.zone-word[data-word="${w}"]`);
+          if (found) found.classList.add('wrong');
+        });
+      }
+    });
+  });
+
+  // Fallback: check by category name match
+  correctCount = 0;
+  document.querySelectorAll('.zone-word').forEach(zw => {
+    const w = zw.dataset.word;
+    const zoneCat = zw.closest('.drop-zone').querySelector('h4').textContent;
+    const correctCat = getCorrectCategory(w);
+    if (zoneCat === correctCat) { correctCount++; zw.classList.add('correct'); zw.classList.remove('wrong'); }
+    else { zw.classList.add('wrong'); zw.classList.remove('correct'); }
+  });
+
+  const percentage = Math.round((correctCount / totalWords) * 100);
+  document.getElementById('controls').style.display = 'none';
+  const resultBox = document.getElementById('result');
+  resultBox.style.display = 'block';
+  resultBox.classList.add('animate');
+  document.getElementById('resultTitle').textContent = percentage >= 80 ? '🎉 ممتاز!' : percentage >= 50 ? '👍 جيد!' : '💪 حاول مرة أخرى!';
+  document.getElementById('scoreDisplay').textContent = percentage + '%';
+  document.getElementById('resultDetails').textContent = `أجبت على ${correctCount} من ${totalWords} بشكل صحيح`;
+  if (percentage >= 80) spawnConfetti();
+  saveResult(percentage, correctCount, totalWords);
+}
+
+function resetActivity() {
+  placedWords = {}; correctCount = 0;
+  document.getElementById('controls').style.display = 'flex';
+  document.getElementById('result').style.display = 'none';
+  zonesEl = document.getElementById('dropZones');
+  zonesEl.innerHTML = '';
+  document.getElementById('wordBank').innerHTML = '';
+  init();
+}
+
+function goBack() { window.location.href = 'grade1.html'; }
+
+function spawnConfetti() {
+  const emojis = ['🎉','⭐','🌟','✨','🎊','💯'];
+  for (let i = 0; i < 20; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti'; el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.animationDuration = (2 + Math.random() * 2) + 's';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }, i * 100);
+  }
+}
+
+function saveResult(percentage, correct, total) {
+  try {
+    const token = localStorage.getItem('studentToken');
+    const grade = localStorage.getItem('studentGrade');
+    if (!token) return;
+    fetch(`${window.location.origin}/api/activities/save-result`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Cookie': 'token=' + token },
+      body: JSON.stringify({ grade: parseInt(grade), activity_type: 'فرز_الكلمات', score: correct, total_questions: total, percentage: percentage, sectionReading: 0, sectionComprehension: 0, sectionGrammar: 0, sectionVocabulary: correct, sectionHandwriting: 0, activity_date: new Date().toLocaleDateString('ar-EG') })
+    }).catch(() => {});
+  } catch(e) {}
+}
+
+init();
+</script>
+</body>
+</html>
