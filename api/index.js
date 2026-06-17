@@ -6,7 +6,7 @@ const DATA_FILE = process.env.NODE_ENV === 'production'
   ? '/tmp/data.json'
   : path.join(__dirname, '..', 'data.json');
 
-const ROOT_DIR = process.cwd();
+const PROJECT_ROOT = path.resolve(__dirname, '..');
 
 function loadData() {
   try {
@@ -28,10 +28,10 @@ function saveData(data) {
 function readStaticFile(filename) {
   // Try multiple possible locations on Vercel
   const candidates = [
-    path.join(ROOT_DIR, 'public', filename),
-    path.join(ROOT_DIR, filename),
-    path.join(__dirname, '..', 'public', filename),
-    path.join(__dirname, '..', filename),
+    path.join(PROJECT_ROOT, 'public', filename),
+    path.join(PROJECT_ROOT, filename),
+    path.join(__dirname, 'public', filename),
+    path.join(__dirname, filename),
   ];
   for (const fp of candidates) {
     try {
