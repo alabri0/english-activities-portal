@@ -1,13 +1,8 @@
 {
   "name": "english-activities-portal",
-  "version": "2.0.0",
-  "description": "Oman MOE English Activities Portal with Teacher Dashboard",
-  "main": "api/index.js",
+  "version": "2.1.0",
   "scripts": {
-    "start": "node api/index.js",
-    "vercel-build": "echo \"Build complete\""
-  },
-  "dependencies": {
-    "bcryptjs": "^2.4.3"
+    "build": "echo 'No build needed'",
+    "start": "node src/server.js"
   }
 }
