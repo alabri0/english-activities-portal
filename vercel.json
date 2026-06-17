@@ -10,6 +10,5 @@
     { "src": "/student", "dest": "/api/index.js" },
     { "src": "/student/dashboard", "dest": "/api/index.js" },
     { "src": "/(.*)", "dest": "/$1" }
-  ],
-  "public": true
+  ]
 }
