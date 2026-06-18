@@ -1,16 +1,15 @@
 {
   "builds": [
-    { "src": "public/**/*", "use": "@vercel/static" },
-    { "src": "out/**/*", "use": "@vercel/static" }
+    { "src": "api/index.js", "use": "@vercel/node" }
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.js" },
-    { "src": "/admin", "dest": "/admin.js" },
+    { "src": "/admin", "dest": "/api/index.js" },
     { "src": "/student", "dest": "/api/index.js" },
     { "src": "/student/dashboard", "dest": "/api/index.js" },
     { "src": "/grade*", "dest": "/api/index.js" },
     { "src": "/activities/(.*)", "dest": "/api/index.js" },
-    { "src": "/(.*)", "dest": "/$1" }
+    { "src": "/(.*)", "dest": "/api/index.js" }
   ],
   "github": {
     "silent": true

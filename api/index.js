@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcryptjs');
 
 // Use /tmp for Vercel serverless (read-write) or __dirname for local dev
 const DATA_FILE = process.env.NODE_ENV === 'production'
@@ -25,6 +26,34 @@ function saveData(data) {
   }
 }
 
+function simpleHash(str) {
+  return str; // Simple hash for Vercel (not secure, but consistent with existing data)
+}
+
+function seedDefaults() {
+  try {
+    const data = loadData();
+    if (!data.teachers || data.teachers.length === 0) {
+      const hash = bcrypt.hashSync('Admin@2024', 10);
+      data.teachers = [{
+        id: 1,
+        username: 'admin',
+        password_hash: hash,
+        full_name: 'مدير المنصة',
+        created_at: new Date().toISOString(),
+        token: null,
+        token_expiry: null
+      }];
+      saveData(data);
+    }
+  } catch (e) {
+    console.error('seedDefaults error:', e.message);
+  }
+}
+
+// Seed defaults on every cold start
+seedDefaults();
+
 function readStaticFile(filename) {
   // Try multiple possible locations on Vercel
   const candidates = [
@@ -40,6 +69,8 @@ function readStaticFile(filename) {
     '/var/task/' + filename,
     '/var/task/out/' + filename,
     '/var/task/out/public/' + filename,
+    path.join(process.cwd(), 'public', filename),
+    path.join(process.cwd(), filename),
   ];
   for (const fp of candidates) {
     try {
@@ -89,7 +120,9 @@ module.exports = async function handler(req, res) {
     const db = loadData();
     const teacher = (db.teachers || []).find(t => t.username === username);
     if (!teacher) return res.status(401).json({ error: 'Invalid credentials' });
-    if (password !== 'admin123') return res.status(401).json({ error: 'Invalid credentials' });
+    if (!bcrypt.compareSync(password, teacher.password_hash)) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
     return res.status(200).json({
       success: true,
       teacher: { id: teacher.id, username: teacher.username, fullName: teacher.full_name }

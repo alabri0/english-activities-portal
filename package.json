@@ -4,5 +4,17 @@
   "scripts": {
     "build": "echo 'No build needed'",
     "start": "node src/server.js"
+  },
+  "dependencies": {
+    "axios": "^1.18.0",
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.11.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "helmet": "^8.2.0",
+    "morgan": "^1.11.0",
+    "uuid": "^14.0.0"
   }
 }
